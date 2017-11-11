@@ -1,0 +1,6 @@
+
+include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Targets.cmake")
+
+get_filename_component(PACKAGE_PREFIX_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
+
+set( ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS "${PACKAGE_PREFIX_DIR}/include/spirvPacker" )

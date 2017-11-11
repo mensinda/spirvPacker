@@ -1,0 +1,49 @@
+# Automatically generated file; DO NOT EDIT
+
+project( @CM_CURRENT_LIB_LC@ )
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+
+set( @CM_CURRENT_LIB_SRC@
+@CM_CURRENT_SRC_CPP@
+)
+
+set( @CM_CURRENT_LIB_INC@
+@CM_CURRENT_SRC_HPP@
+)
+
+
+set( @CM_CURRENT_LIB_INC@ ${@CM_CURRENT_LIB_INC@} ${EXPORT_FILE} )
+
+set( CURRENT_LIB_TARGETS )
+
+if(BUILD_STATIC_LIBS)
+  set( CURRENT_LIB_TARGETS @CM_CURRENT_LIB_LC@ @CM_CURRENT_LIB_LC@_static )
+  add_library( @CM_CURRENT_LIB_LC@_obj    OBJECT ${@CM_CURRENT_LIB_SRC@} ${@CM_CURRENT_LIB_INC@} )
+  add_library( @CM_CURRENT_LIB_LC@        SHARED $<TARGET_OBJECTS:@CM_CURRENT_LIB_LC@_obj> )
+  add_library( @CM_CURRENT_LIB_LC@_static STATIC $<TARGET_OBJECTS:@CM_CURRENT_LIB_LC@_obj> )
+else()
+  set( CURRENT_LIB_TARGETS @CM_CURRENT_LIB_LC@ )
+  add_library( @CM_CURRENT_LIB_LC@        SHARED ${@CM_CURRENT_LIB_SRC@} ${@CM_CURRENT_LIB_INC@} )
+endif()
+
+foreach( I IN LISTS CURRENT_LIB_TARGETS )
+  target_link_libraries( ${I} @CM_CURRENT_LIB_DEP@ )
+endforeach()
+
+set_target_properties(
+  ${CURRENT_LIB_TARGETS}
+  PROPERTIES
+    VERSION        @CM_VERSION_MAJOR@.@CM_VERSION_MINOR@.@CM_VERSION_SUBMINOR@
+    SOVERSION      @CM_VERSION_MAJOR@
+    PUBLIC_HEADER  "${@CM_CURRENT_LIB_INC@}"
+    OUTPUT_NAME    "@CM_CURRENT_LIB_LC@"
+)
+
+install(
+  TARGETS       ${CURRENT_LIB_TARGETS}
+  EXPORT        @PROJECT_NAME@Targets
+  RUNTIME       DESTINATION bin
+  LIBRARY       DESTINATION lib/spirvPacker
+  ARCHIVE       DESTINATION lib/spirvPacker
+  PUBLIC_HEADER DESTINATION include/spirvPacker
+)
