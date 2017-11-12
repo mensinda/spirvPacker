@@ -40,20 +40,21 @@ else()
   set( COVERAGE_COMPILER_FLAG "" )
 endif()
 
-add_compiler( GNU MIN_VERSION "5.3"
+add_compiler( GNU MIN_VERSION "7.0"
               ALL      "-Wall -Wextra -Wno-comment -Wfloat-equal -Wshadow -Wno-unknown-pragmas -fdiagnostics-color=always"
                        "${COVERAGE_COMPILER_FLAG}"
               DEBUG    "-O0 -Werror"
               SANITIZE "-fsanitize=${SANITIZERS}"
               RELEASE  "-O3" )
 
-add_compiler( Clang
+add_compiler( Clang MIN_VERSION "5.0"
               ALL      "-Weverything -ftemplate-backtrace-limit=0 -fcolor-diagnostics"
                        "-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded -Wno-float-equal"
                        "-Wno-gnu-anonymous-struct -Wno-nested-anon-types -Wno-exit-time-destructors"
                        "-Wno-global-constructors -Wno-switch-enum -Wno-reserved-id-macro"
                        "-Wno-documentation-unknown-command -Wno-unused-macros -Wno-weak-vtables"
                        "-Wno-double-promotion -Wno-undefined-func-template"
+                       "-isystem ${PROJECT_SOURCE_DIR}/external/variant"
               DEBUG    "-Werror"
               SANITIZE "-fsanitize=${SANITIZERS}"
               RELEASE  "-O2" )

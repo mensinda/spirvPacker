@@ -1,0 +1,9 @@
+#pragma once
+
+#include "variant.hpp"
+
+namespace std {
+  using mpark::variant;
+  using mpark::get;
+  using mpark::bad_variant_access;
+}
