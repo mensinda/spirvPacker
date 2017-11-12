@@ -66,6 +66,8 @@ ReflowComments:        true
 IncludeCategories:
  - Regex: 'spvCfg.hpp'
    Priority: -1
+ - Regex: 'catch.hpp'
+   Priority: 5
  - Regex: '[A-Z][a-zA-Z0-9]*.[ch]pp'
    Priority: 10
  - Regex: '.*'

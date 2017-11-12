@@ -75,6 +75,13 @@ new_project_executable(
   DEPENDENCIES ${PROJECT_NAME}
 )
 
+new_project_executable(
+  PATH         "${PROJECT_SOURCE_DIR}/test"
+  NAME         "tests"
+  TEMPLATE     "${TEMPLATES_DIR}/CMakeLists.exe.in"
+  DEPENDENCIES ${PROJECT_NAME}
+)
+
 
 include_directories(
   "${PROJECT_BINARY_DIR}"
@@ -82,7 +89,9 @@ include_directories(
   ${${PROJECT_NAME}_EXE_INCLUDE_DIRECTORIES}
 )
 
-include_directories( SYSTEM )
+include_directories( SYSTEM
+  ${PROJECT_SOURCE_DIR}/external/catch
+)
 
 # Add all libs and tests directories
 foreach( I IN LISTS ${PROJECT_NAME}_SUBDIR_LIST )

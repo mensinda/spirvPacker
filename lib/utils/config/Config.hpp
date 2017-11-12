@@ -79,6 +79,11 @@ class ConfigEntry final : public ConfigNode {
   inline VAL_TYPE value() const noexcept { return vValue; }
   inline VAL_TYPE operator*() const noexcept { return vValue; }
 
+  inline std::string valStr() const { return std::get<std::string>(vValue); }
+  inline long int    valInt() const { return std::get<long int>(vValue); }
+  inline double      valDouble() const { return std::get<double>(vValue); }
+  inline bool        valBool() const { return std::get<bool>(vValue); }
+
   bool accept(ConfigVisitor *_vis) override;
   bool validate() const override;
 };
