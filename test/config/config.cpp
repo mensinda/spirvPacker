@@ -100,9 +100,7 @@ SCENARIO("Setting and reading config entries", "[cfg]") {
       AND_WHEN("adding a differnet type to the array") {
         lRoot["testSec"]("array") += false;
 
-        THEN("the validation should fail") {
-          REQUIRE(lRoot.validate() == false);
-        }
+        THEN("the validation should fail") { REQUIRE(lRoot.validate() == false); }
       }
     }
 

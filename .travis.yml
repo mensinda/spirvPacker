@@ -42,7 +42,7 @@ install:
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
-  - CLANG_FORMAT_CMD=clang-format-5.0 ./checkFormat.sh
+  - CLANG_FORMAT_CMD=clang-format-5.0 ./checkFormat.sh --only-check
   - mkdir build
   - cd build
   - ${CMAKE_EXE} -DCMAKE_CXX_COMPILER="${COMPILER}" -DENABLE_CODE_COVERAGE=$COVERAGE ..

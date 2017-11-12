@@ -42,8 +42,8 @@ bool ConfigEntry::validate() const {
 
   if (vValue.index() == ARRAY_TYPE) {
     ArrayType const &lData = std::get<ArrayType>(vValue);
-    for(auto const& i : lData.array) {
-      if(i.index() != lData.index) {
+    for (auto const &i : lData.array) {
+      if (i.index() != lData.index) {
         std::cerr << "Config validation failed: Invalid type for array element in " << genPath() << std::endl;
         return false;
       }
