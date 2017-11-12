@@ -52,7 +52,7 @@ SCENARIO("Setting and reading config entries", "[cfg]") {
     ConfigSection lRoot;
 
     lRoot.addEntry("rootEntry", 12l, [](ConfigEntry const *e) { return std::get<long int>(e->value()) > 0; });
-    lRoot.addEntry("boolTest", true, [](ConfigEntry const *e) { return std::get<bool>(**e) == true; });
+    lRoot.addEntry("boolTest", true);
 
     lRoot.addSection("testSec");
     lRoot["testSec"].addSection("content");

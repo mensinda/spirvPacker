@@ -34,16 +34,19 @@ bool ConfigPrinter::visit(ConfigEntry *_entry) {
 
   switch (lVal.index()) {
     case 0:
-      vData += "[STRING] " + std::get<0>(lVal) + " (" + std::get<0>(lDev) + ")";
+      vData += "[STRING] " + _entry->getName() + ": ";
+      vData += "\'" + std::get<0>(lVal) + "\' (\'" + std::get<0>(lDev) + "\')";
       break; // std::string
     case 1:
-      vData += "[L INT]  " + std::to_string(std::get<1>(lVal)) + " (" + std::to_string(std::get<1>(lDev)) + ")";
+      vData += "[L INT]  " + _entry->getName() + ": ";
+      vData += std::to_string(std::get<1>(lVal)) + " (" + std::to_string(std::get<1>(lDev)) + ")";
       break; // long int
     case 2:
-      vData += "[DOUBLE] " + std::to_string(std::get<2>(lVal)) + " (" + std::to_string(std::get<2>(lDev)) + ")";
+      vData += "[DOUBLE] " + _entry->getName() + ": ";
+      vData += std::to_string(std::get<2>(lVal)) + " (" + std::to_string(std::get<2>(lDev)) + ")";
       break; // double
     case 3:
-      vData += "[BOOL]   ";
+      vData += "[BOOL]   " + _entry->getName() + ": ";
       vData += std::get<3>(lVal) ? "true " : "false";
       vData += " (";
       vData += (std::get<3>(lDev) ? "true" : "false");

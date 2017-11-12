@@ -5,6 +5,7 @@ project( tests )
 set( TESTS_SRC
 
    ${CMAKE_CURRENT_SOURCE_DIR}/config/config.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/config/printer.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 
