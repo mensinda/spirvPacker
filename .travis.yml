@@ -1,11 +1,9 @@
 language: cpp
 sudo: false
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-5.0
+my_sources: &allSources
+  - ubuntu-toolchain-r-test
+  - llvm-toolchain-trusty-5.0
 
 cache:
   directories: ["$HOME/cmakeTar"]
@@ -17,6 +15,7 @@ matrix:
       compiler: clang
       addons:
         apt:
+          sources: *allSources
           packages: ['clang-format-5.0', 'clang-5.0']
       env: COMPILER='clang++-5.0'
 
@@ -24,6 +23,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
+          sources: *allSources
           packages: ['clang-format-5.0', 'g++-7']
       env: COMPILER='g++-7'
 
