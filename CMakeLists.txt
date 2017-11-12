@@ -25,8 +25,9 @@ set( CMAKE_C_STANDARD                 11 )
 set( CMAKE_C_STANDARD_REQUIRED        ON )
 set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON )
 
-option( BUILD_STATIC_LIBS "Enable building static libs"     OFF )
-option( USE_LIBCXX        "Use libc++ instead of libstdc++" OFF )
+option( BUILD_STATIC_LIBS    "Enable building static libs"     OFF )
+option( USE_LIBCXX           "Use libc++ instead of libstdc++" OFF )
+option( ENABLE_CODE_COVERAGE "Enables code coverage tests"     OFF )
 
 if( USE_LIBCXX )
   set( CXX_STDLIB_FLAGS "-stdlib=libc++" ) #  -lc++abi
@@ -40,8 +41,15 @@ run_git()
 # Set up the build environment #
 ################################
 
+if( ENABLE_CODE_COVERAGE )
+  set( COVERAGE_COMPILER_FLAG "--coverage" )
+else()
+  set( COVERAGE_COMPILER_FLAG "" )
+endif()
+
 add_compiler( GNU MIN_VERSION "5.3"
-              ALL      "-Wall -Wextra -Wno-comment -Wfloat-equal -Wshadow -Wno-unknown-pragmas -fdiagnostics-color=always ${CXX_STDLIB_FLAGS}"
+              ALL      "-Wall -Wextra -Wno-comment -Wfloat-equal -Wshadow -Wno-unknown-pragmas -fdiagnostics-color=always"
+                       "${COVERAGE_COMPILER_FLAG} ${CXX_STDLIB_FLAGS}"
               DEBUG    "-O0 -Werror"
               SANITIZE "-fsanitize=${SANITIZERS}"
               RELEASE  "-O3" )

@@ -11,13 +11,33 @@ cache:
 matrix:
   include:
 
+    # Code coverage
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: *allSources
+          packages: ['clang-format-5.0', 'g++-7', 'lcov']
+      env: COVERAGE=ON  LIBCXX=OFF COMPILER='g++-7'
+
+
+    # Clang
     - os: linux
       compiler: clang
       addons:
         apt:
           sources: *allSources
-          packages: ['clang-format-5.0', 'clang-5.0']
-      env: COMPILER='clang++-5.0'
+          packages: ['clang-format-5.0', 'clang-5.0', 'libc++-dev']
+      env: COVERAGE=OFF LIBCXX=ON COMPILER='clang++-5.0'
+
+    # GCC
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: *allSources
+          packages: ['clang-format-5.0', 'g++-7', 'libc++-dev']
+      env: COVERAGE=OFF LIBCXX=ON COMPILER='g++-7'
 
     - os: linux
       compiler: gcc
@@ -25,7 +45,7 @@ matrix:
         apt:
           sources: *allSources
           packages: ['clang-format-5.0', 'g++-7']
-      env: COMPILER='g++-7'
+      env: COVERAGE=OFF LIBCXX=OFF COMPILER='g++-7'
 
 before_install:
   - CM_V_MAJOR=3
@@ -37,14 +57,15 @@ before_install:
 install:
   - if [ ! -d "$HOME/cmakeTar" ]; then mkdir "$HOME/cmakeTar"; fi
   - cd "$HOME/cmakeTar"
-  - if [ ! -e "${CMAKE_BASE_NAME}.tar.gz" ]; then wget "$CMAKE_DOWNLOAD_LINK" fi
+  - if [ ! -e "${CMAKE_BASE_NAME}.tar.gz" ]; then wget "$CMAKE_DOWNLOAD_LINK"; fi
   - tar -xf "${CMAKE_BASE_NAME}.tar.gz" -C "$HOME"
   - CMAKE_EXE="$HOME/${CMAKE_BASE_NAME}/bin/cmake"
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
+  - ./checkFormat.sh
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER="${COMPILER}" ..
+  - cmake -DCMAKE_CXX_COMPILER="${COMPILER}" -DUSE_LIBCXX=$LIBCXX -DENABLE_CODE_COVERAGE=$COVERAGE ..
   - make
   - ./bin/tests

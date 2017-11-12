@@ -80,7 +80,8 @@ SCENARIO("Setting and reading config entries", "[cfg]") {
       lRoot["testSec"]["content"]("int")    = 42l;
 
       THEN("these values should be set") {
-        REQUIRE(lRoot["testSec"]["content"]("double").valDouble() == 5.1);
+        REQUIRE(lRoot["testSec"]["content"]("double").valDouble() > 5.0);
+        REQUIRE(lRoot["testSec"]["content"]("double").valDouble() < 5.2);
         REQUIRE(lRoot["testSec"]["content"]("str").valStr() == "Hello World");
         REQUIRE(lRoot["testSec"]["content"]("int").valInt() == 42l);
       }
