@@ -17,12 +17,14 @@
 #include "spvCfg.hpp"
 #include "ConfigPrinter.hpp"
 
+#define GET(type, val) std::get<ConfigEntry::type>(val)
+
 using namespace spirvPacker;
 
 ConfigPrinter::ConfigPrinter(std::string _indent) : vIndentStr(_indent) {}
 
 bool ConfigPrinter::visit(ConfigEntry *_entry) {
-  vData += vIndentStr + "--> ";
+  vData += vCurrIndent + "--> ";
 
   auto lVal = _entry->value();
   auto lDev = _entry->defaultValue();
@@ -33,26 +35,49 @@ bool ConfigPrinter::visit(ConfigEntry *_entry) {
   }
 
   switch (lVal.index()) {
-    case 0:
+    case ConfigEntry::STR_TYPE:
       vData += "[STRING] " + _entry->getName() + ": ";
-      vData += "\'" + std::get<0>(lVal) + "\' (\'" + std::get<0>(lDev) + "\')";
+      vData += "\'" + GET(STR_TYPE, lVal) + "\' (\'" + GET(STR_TYPE, lDev) + "\')";
       break; // std::string
-    case 1:
+    case ConfigEntry::INT_TYPE:
       vData += "[L INT]  " + _entry->getName() + ": ";
-      vData += std::to_string(std::get<1>(lVal)) + " (" + std::to_string(std::get<1>(lDev)) + ")";
+      vData += std::to_string(GET(INT_TYPE, lVal)) + " (" + std::to_string(GET(INT_TYPE, lDev)) + ")";
       break; // long int
-    case 2:
+    case ConfigEntry::DOUBLE_TYPE:
       vData += "[DOUBLE] " + _entry->getName() + ": ";
-      vData += std::to_string(std::get<2>(lVal)) + " (" + std::to_string(std::get<2>(lDev)) + ")";
+      vData += std::to_string(GET(DOUBLE_TYPE, lVal)) + " (" + std::to_string(GET(DOUBLE_TYPE, lDev)) + ")";
       break; // double
-    case 3:
+    case ConfigEntry::BOOL_TYPE:
       vData += "[BOOL]   " + _entry->getName() + ": ";
-      vData += std::get<3>(lVal) ? "true " : "false";
+      vData += GET(BOOL_TYPE, lVal) ? "true " : "false";
       vData += " (";
-      vData += (std::get<3>(lDev) ? "true" : "false");
+      vData += GET(BOOL_TYPE, lDev) ? "true" : "false";
       vData += ")";
       break; // bool
-    default: vData += "[UNKNOWN]";
+    case ConfigEntry::ARRAY_TYPE:
+      vData += "[ARRAY]  " + _entry->getName() + ": (size: " + std::to_string(_entry->size()) + ")\n";
+      for (auto &i : GET(ARRAY_TYPE, lVal).array) {
+        vData += vCurrIndent + vIndentStr + "- ";
+
+        switch (GET(ARRAY_TYPE, lVal).index) {
+          case ConfigEntry::STR_TYPE:
+            vData += "\'" + GET(STR_TYPE, i) + "\'";
+            break; // std::string
+          case ConfigEntry::INT_TYPE:
+            vData += std::to_string(GET(INT_TYPE, i));
+            break; // long int
+          case ConfigEntry::DOUBLE_TYPE:
+            vData += std::to_string(GET(DOUBLE_TYPE, i));
+            break; // double
+          case ConfigEntry::BOOL_TYPE:
+            vData += "[BOOL]   " + _entry->getName() + ": ";
+            vData += GET(BOOL_TYPE, i) ? "true " : "false";
+            break;
+        }
+
+        vData += "\n";
+      }
+      break;
   }
 
   vData += "\n";

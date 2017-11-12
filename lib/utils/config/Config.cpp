@@ -34,26 +34,20 @@ std::string ConfigNode::genPath() const noexcept {
 
 
 
-
-ConfigEntry::ConfigEntry(ConfigNode *_parent, std::string _name, VAL_TYPE _devVal, FUNCTION _validate)
-    : ConfigNode(_parent, _name), vDefaultValue(_devVal), vValue(vDefaultValue), vValidata(_validate) {}
-
-ConfigEntry &ConfigEntry::operator=(VAL_TYPE const &_val) {
-  vValue = _val;
-
-  if (!validate()) {
-    vValue = vDefaultValue;
-    throw std::runtime_error("Validation for config entry '" + genPath() + "' failed");
-  }
-  return *this;
-}
-
-bool ConfigEntry::accept(ConfigVisitor *_vis) { return _vis->visit(this); }
-
 bool ConfigEntry::validate() const {
   if (vValue.index() != vDefaultValue.index()) {
     std::cerr << "Config validation failed: Invalid type for " << genPath() << std::endl;
     return false;
+  }
+
+  if (vValue.index() == ARRAY_TYPE) {
+    ArrayType const &lData = std::get<ArrayType>(vValue);
+    for(auto const& i : lData.array) {
+      if(i.index() != lData.index) {
+        std::cerr << "Config validation failed: Invalid type for array element in " << genPath() << std::endl;
+        return false;
+      }
+    }
   }
 
   bool lRes = vValidata(this);
@@ -73,7 +67,7 @@ ConfigEntry &ConfigSection::operator()(std::string _name) {
   auto lFindRes = find_if(begin(vEntries), end(vEntries), [=](auto const &t) { return _name == t.getName(); });
 
   if (lFindRes == end(vEntries))
-    throw std::runtime_error("Config entry '" + _name + "' does not exist in '" + genPath() + "' failed");
+    throw std::runtime_error("Config entry '" + _name + "' does not exist in '" + genPath() + "'");
 
   return *lFindRes;
 }
@@ -82,11 +76,14 @@ ConfigSection &ConfigSection::operator[](std::string _name) {
   auto lFindRes = find_if(begin(vSubSections), end(vSubSections), [=](auto const &t) { return _name == t.getName(); });
 
   if (lFindRes == end(vSubSections))
-    throw std::runtime_error("Subsection '" + _name + "' does not exist in '" + genPath() + "' failed");
+    throw std::runtime_error("Subsection '" + _name + "' does not exist in '" + genPath() + "'");
 
   return *lFindRes;
 }
 
+/*!
+ * \brief Accepts a visitor
+ */
 bool ConfigSection::accept(ConfigVisitor *_vis) {
   if (_vis->visitEnter(this)) {
 
@@ -102,6 +99,9 @@ bool ConfigSection::accept(ConfigVisitor *_vis) {
   return _vis->visitLeave(this);
 }
 
+/*!
+ * Validates the entire configuration tree
+ */
 bool ConfigSection::validate() const {
   for (auto const &i : vSubSections)
     if (!i.validate())
@@ -114,6 +114,9 @@ bool ConfigSection::validate() const {
   return true;
 }
 
+/*!
+ * Creates a new config entry or returns an existing one
+ */
 ConfigEntry &ConfigSection::addEntry(std::string           _name,
                                      ConfigEntry::VAL_TYPE _devVal,
                                      ConfigEntry::FUNCTION _validate) {
@@ -127,6 +130,9 @@ ConfigEntry &ConfigSection::addEntry(std::string           _name,
   return *lFindRes;
 }
 
+/*!
+ * Creates a new config section or returns an existing one
+ */
 ConfigSection &ConfigSection::addSection(std::string _name) {
   auto lFindRes = find_if(begin(vSubSections), end(vSubSections), [=](auto const &t) { return _name == t.getName(); });
 

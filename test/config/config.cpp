@@ -60,18 +60,50 @@ SCENARIO("Setting and reading config entries", "[cfg]") {
     lRoot["testSec"]["content"].addEntry("int", 12l, [](ConfigEntry const *e) { return e->valInt() > 0; });
     lRoot["testSec"]["content"].addEntry("double", 1.0f, [](ConfigEntry const *e) { return e->valDouble() < 10; });
     lRoot["testSec"]["content"].addEntry("bool", true, [](ConfigEntry const *e) { return e->valBool(); });
+    lRoot["testSec"].addArrayEntry(
+        "array", {ConfigEntry::STR_TYPE, {"Test"_str}}, [](ConfigEntry const *e) { return !e->empty(); });
 
     THEN("the default values should be set") {
       REQUIRE(lRoot.validate() == true);
       REQUIRE(lRoot("rootEntry").valInt() == 12);
       REQUIRE(lRoot("boolTest").valBool() == true);
       REQUIRE(lRoot["testSec"]["content"]("int").valInt() == 12);
+      REQUIRE(std::get<std::string>(lRoot["testSec"]("array")[0]) == "Test");
     }
 
     THEN("invalid access should fail") {
       REQUIRE_THROWS_AS(lRoot["testSec"]["content"]("str").valDouble(), std::bad_variant_access);
-      REQUIRE_THROWS_WITH(lRoot["testSec"]["content"]("int") = -1l, Contains("Validation") && Contains("failed"));
-      REQUIRE_THROWS_WITH(lRoot["testSec"]["content"]("int") = false, Contains("Validation") && Contains("failed"));
+      REQUIRE_THROWS_AS(lRoot["testSec"]["content"]("str").clear(), std::bad_variant_access);
+      REQUIRE_NOTHROW(lRoot["testSec"]["content"]("int") = -1l);
+      REQUIRE_NOTHROW(lRoot["testSec"]["content"]("double") = false);
+      REQUIRE(lRoot.validate() == false);
+    }
+
+    WHEN("modifying an array") {
+      lRoot["testSec"]("array") += "asd"_str;
+      lRoot["testSec"]("array") += "fff"_str;
+
+      THEN("the values should be stored") {
+        REQUIRE(lRoot["testSec"]("array").size() == 3);
+        REQUIRE(lRoot.validate() == true);
+        REQUIRE(std::get<std::string>(lRoot["testSec"]("array")[1]) == "asd");
+      }
+
+      AND_WHEN("clearing the test array") {
+        lRoot["testSec"]("array").clear();
+        THEN("the custom validation function should fail") {
+          REQUIRE(lRoot["testSec"]("array").empty() == true);
+          REQUIRE(lRoot.validate() == false);
+        }
+      }
+
+      AND_WHEN("adding a differnet type to the array") {
+        lRoot["testSec"]("array") += false;
+
+        THEN("the validation should fail") {
+          REQUIRE(lRoot.validate() == false);
+        }
+      }
     }
 
     WHEN("setting new values") {

@@ -56,8 +56,20 @@ class ConfigNode {
 
 class ConfigEntry final : public ConfigNode {
  public:
-  typedef std::function<bool(ConfigEntry const *)>          FUNCTION;
-  typedef std::variant<std::string, long int, double, bool> VAL_TYPE;
+  typedef std::variant<std::string, long int, double, bool> ARRAY_VAL_TYPE;
+  struct ArrayType {
+    size_t                      index;
+    std::vector<ARRAY_VAL_TYPE> array;
+  };
+
+  static const size_t STR_TYPE    = 0;
+  static const size_t INT_TYPE    = 1;
+  static const size_t DOUBLE_TYPE = 2;
+  static const size_t BOOL_TYPE   = 3;
+  static const size_t ARRAY_TYPE  = 4;
+
+  typedef std::function<bool(ConfigEntry const *)>                     FUNCTION;
+  typedef std::variant<std::string, long int, double, bool, ArrayType> VAL_TYPE;
 
  private:
   VAL_TYPE vDefaultValue;
@@ -65,7 +77,8 @@ class ConfigEntry final : public ConfigNode {
   FUNCTION vValidata;
 
  public:
-  ConfigEntry(ConfigNode *_parent, std::string _name, VAL_TYPE _devVal, FUNCTION _validate);
+  ConfigEntry(ConfigNode *_parent, std::string _name, VAL_TYPE _devVal, FUNCTION _validate)
+      : ConfigNode(_parent, _name), vDefaultValue(_devVal), vValue(vDefaultValue), vValidata(_validate) {}
 
   ConfigEntry(ConfigEntry const &) = default;
   ConfigEntry &operator=(const ConfigEntry &) = default;
@@ -73,7 +86,15 @@ class ConfigEntry final : public ConfigNode {
   ConfigEntry(ConfigEntry &&) = default;
   ConfigEntry &operator=(ConfigEntry &&) = default;
 
-  ConfigEntry &operator=(const VAL_TYPE &_val);
+  inline ConfigEntry &operator=(const VAL_TYPE &_val) {
+    vValue = _val;
+    return *this;
+  }
+
+  inline ConfigEntry &operator+=(const ARRAY_VAL_TYPE &_val) {
+    emplace_back(_val);
+    return *this;
+  }
 
   inline VAL_TYPE defaultValue() const noexcept { return vDefaultValue; }
   inline VAL_TYPE value() const noexcept { return vValue; }
@@ -84,8 +105,20 @@ class ConfigEntry final : public ConfigNode {
   inline double      valDouble() const { return std::get<double>(vValue); }
   inline bool        valBool() const { return std::get<bool>(vValue); }
 
-  bool accept(ConfigVisitor *_vis) override;
-  bool validate() const override;
+  // Array operations only
+  inline ARRAY_VAL_TYPE valArray(size_t _i) { return std::get<ArrayType>(vValue).array[_i]; }
+  inline size_t         size() const { return std::get<ArrayType>(vValue).array.size(); }
+  inline void           clear() { std::get<ArrayType>(vValue).array.clear(); }
+  inline bool           empty() const { return size() == 0; }
+  inline ARRAY_VAL_TYPE operator[](size_t _i) { return valArray(_i); }
+
+  inline ARRAY_VAL_TYPE emplace_back(ARRAY_VAL_TYPE _value) {
+    std::get<ArrayType>(vValue).array.emplace_back(_value);
+    return std::get<ArrayType>(vValue).array.back();
+  }
+
+  inline bool accept(ConfigVisitor *_vis) override { return _vis->visit(this); }
+  bool        validate() const override;
 };
 
 
@@ -108,6 +141,12 @@ class ConfigSection final : public ConfigNode {
 
   ConfigSection &operator[](std::string _name);
   ConfigEntry &  operator()(std::string _name);
+
+  inline ConfigEntry &addArrayEntry(std::string            _name,
+                                    ConfigEntry::ArrayType _devVal,
+                                    ConfigEntry::FUNCTION  _validate = [](ConfigEntry const *) { return true; }) {
+    return addEntry(_name, _devVal, _validate);
+  }
 
   ConfigEntry &addEntry(std::string           _name,
                         ConfigEntry::VAL_TYPE _devVal,

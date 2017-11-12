@@ -36,6 +36,10 @@ SCENARIO("Printing the current config to a string", "[cfg]") {
     lRoot["testSec"]["content"].addEntry("int", 12l);
     lRoot["testSec"]["content"].addEntry("double", 1.0f);
     lRoot["testSec"]["content"].addEntry("bool", true);
+    lRoot["testSec"].addArrayEntry("arrayStr", {ConfigEntry::STR_TYPE, {"Test"_str, "asdf"_str}});
+    lRoot["testSec"].addArrayEntry("arrayInt", {ConfigEntry::INT_TYPE, {21l, 42l, 84l}});
+    lRoot["testSec"].addArrayEntry("arrayDouble", {ConfigEntry::DOUBLE_TYPE, {1.1}});
+    lRoot["testSec"].addArrayEntry("arrayBool", {ConfigEntry::BOOL_TYPE, {true, false}});
 
     WHEN("the printer prints the config") {
       lRoot.accept(&lPrinter);
@@ -44,6 +48,7 @@ SCENARIO("Printing the current config to a string", "[cfg]") {
         auto lRes = lPrinter.getResult();
         REQUIRE(lRes.empty() == false);
         REQUIRE_THAT(lRes, Contains("rootEntry") && Contains("12 (12)"));
+        REQUIRE_THAT(lRes, Contains("arrayInt") && Contains("(size: 3)") && Contains("- 84"));
       }
 
       AND_WHEN("the printer is reset") {

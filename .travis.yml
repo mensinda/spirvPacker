@@ -23,7 +23,7 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: COMPILER='clang++-5.0' COVERAGE=ON
+      env: COMPILER='clang++-5.0' COVERAGE=OFF
 
 before_install:
   - CM_V_MAJOR=3
