@@ -18,7 +18,7 @@ matrix:
         apt:
           sources: *allSources
           packages: ['clang-format-5.0', 'g++-7', 'lcov']
-      env: COVERAGE=ON  LIBCXX=OFF COMPILER='g++-7'
+      env: COMPILER='g++-7' LIBCXX=OFF COVERAGE=ON
 
 
     # Clang
@@ -28,7 +28,7 @@ matrix:
         apt:
           sources: *allSources
           packages: ['clang-format-5.0', 'clang-5.0', 'libc++-dev']
-      env: COVERAGE=OFF LIBCXX=ON COMPILER='clang++-5.0'
+      env: COMPILER='clang++-5.0' LIBCXX=ON COVERAGE=OFF
 
     # GCC
     - os: linux
@@ -37,7 +37,7 @@ matrix:
         apt:
           sources: *allSources
           packages: ['clang-format-5.0', 'g++-7', 'libc++-dev']
-      env: COVERAGE=OFF LIBCXX=ON COMPILER='g++-7'
+      env: COMPILER='g++-7' LIBCXX=ON COVERAGE=OFF
 
     - os: linux
       compiler: gcc
@@ -45,7 +45,7 @@ matrix:
         apt:
           sources: *allSources
           packages: ['clang-format-5.0', 'g++-7']
-      env: COVERAGE=OFF LIBCXX=OFF COMPILER='g++-7'
+      env: COMPILER='g++-7' LIBCXX=OFF  COVERAGE=OFF
 
 before_install:
   - CM_V_MAJOR=3
@@ -63,9 +63,9 @@ install:
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
-  - ./checkFormat.sh
+  - CLANG_FORMAT_CMD=clang-format-5.0 ./checkFormat.sh
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER="${COMPILER}" -DUSE_LIBCXX=$LIBCXX -DENABLE_CODE_COVERAGE=$COVERAGE ..
+  - ${CMAKE_EXE} -DCMAKE_CXX_COMPILER="${COMPILER}" -DUSE_LIBCXX=$LIBCXX -DENABLE_CODE_COVERAGE=$COVERAGE ..
   - make
   - ./bin/tests
