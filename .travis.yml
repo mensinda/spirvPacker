@@ -35,9 +35,9 @@ before_install:
   - CMAKE_DOWNLOAD_LINK="https://cmake.org/files/v${CM_V_MAJOR}.${CM_V_MINOR}/${CMAKE_BASE_NAME}.tar.gz"
 
 install:
-  - [ ! -d "$HOME/cmakeTar" ] && mkdir "$HOME/cmakeTar"
+  - if [ ! -d "$HOME/cmakeTar" ]; then mkdir "$HOME/cmakeTar"; fi
   - cd "$HOME/cmakeTar"
-  - [ ! -e "${CMAKE_BASE_NAME}.tar.gz" ] && wget "$CMAKE_DOWNLOAD_LINK"
+  - if [ ! -e "${CMAKE_BASE_NAME}.tar.gz" ]; then wget "$CMAKE_DOWNLOAD_LINK" fi
   - tar -xf "${CMAKE_BASE_NAME}.tar.gz" -C "$HOME"
   - CMAKE_EXE="$HOME/${CMAKE_BASE_NAME}/bin/cmake"
 
