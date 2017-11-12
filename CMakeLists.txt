@@ -26,14 +26,7 @@ set( CMAKE_C_STANDARD_REQUIRED        ON )
 set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON )
 
 option( BUILD_STATIC_LIBS    "Enable building static libs"     OFF )
-option( USE_LIBCXX           "Use libc++ instead of libstdc++" OFF )
 option( ENABLE_CODE_COVERAGE "Enables code coverage tests"     OFF )
-
-if( USE_LIBCXX )
-  set( CXX_STDLIB_FLAGS "-stdlib=libc++" ) #  -lc++abi
-else()
-  set( CXX_STDLIB_FLAGS "" )
-endif()
 
 run_git()
 
@@ -49,13 +42,13 @@ endif()
 
 add_compiler( GNU MIN_VERSION "5.3"
               ALL      "-Wall -Wextra -Wno-comment -Wfloat-equal -Wshadow -Wno-unknown-pragmas -fdiagnostics-color=always"
-                       "${COVERAGE_COMPILER_FLAG} ${CXX_STDLIB_FLAGS}"
+                       "${COVERAGE_COMPILER_FLAG}"
               DEBUG    "-O0 -Werror"
               SANITIZE "-fsanitize=${SANITIZERS}"
               RELEASE  "-O3" )
 
 add_compiler( Clang
-              ALL      "-Weverything -ftemplate-backtrace-limit=0 -fcolor-diagnostics ${CXX_STDLIB_FLAGS}"
+              ALL      "-Weverything -ftemplate-backtrace-limit=0 -fcolor-diagnostics"
                        "-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded -Wno-float-equal"
                        "-Wno-gnu-anonymous-struct -Wno-nested-anon-types -Wno-exit-time-destructors"
                        "-Wno-global-constructors -Wno-switch-enum -Wno-reserved-id-macro"

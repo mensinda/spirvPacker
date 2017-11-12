@@ -21,6 +21,10 @@ matrix:
       compiler: gcc
       env: COMPILER='g++-7' COVERAGE=ON
 
+    - os: linux
+      compiler: clang
+      env: COMPILER='clang++-5.0' COVERAGE=ON
+
 before_install:
   - CM_V_MAJOR=3
   - CM_V_MINOR=9
