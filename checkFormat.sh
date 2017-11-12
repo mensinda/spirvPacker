@@ -9,7 +9,7 @@
 CLANG_FORMAT_VERSIONS=( "5.0.0" "5.0.1" )
 CALNG_FORMAT_DEFAULT_CMD="clang-format"
 EXTENSIONS=( cpp hpp )
-SOURCE_DIRS=( lib src )
+SOURCE_DIRS=( lib src test )
 
 ########################
 #  END  CONFIG SECTION #

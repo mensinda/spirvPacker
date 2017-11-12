@@ -1,0 +1,50 @@
+language: cpp
+sudo: false
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-trusty-5.0
+
+cache:
+  directories: ["$HOME/cmakeTar"]
+
+matrix:
+  include:
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          packages: ['clang-format-5.0', 'clang-5.0']
+      env: COMPILER='clang++-5.0'
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          packages: ['clang-format-5.0', 'g++-7']
+      env: COMPILER='g++-7'
+
+before_install:
+  - CM_V_MAJOR=3
+  - CM_V_MINOR=9
+  - CM_V_PATCH=6
+  - CMAKE_BASE_NAME="cmake-${CM_V_MAJOR}.${CM_V_MINOR}.${CM_V_PATCH}-Linux-x86_64"
+  - CMAKE_DOWNLOAD_LINK="https://cmake.org/files/v${CM_V_MAJOR}.${CM_V_MINOR}/${CMAKE_BASE_NAME}.tar.gz"
+
+install:
+  - [ ! -d "$HOME/cmakeTar" ] && mkdir "$HOME/cmakeTar"
+  - cd "$HOME/cmakeTar"
+  - [ ! -e "${CMAKE_BASE_NAME}.tar.gz" ] && wget "$CMAKE_DOWNLOAD_LINK"
+  - tar -xf "${CMAKE_BASE_NAME}.tar.gz" -C "$HOME"
+  - CMAKE_EXE="$HOME/${CMAKE_BASE_NAME}/bin/cmake"
+
+script:
+  - cd ${TRAVIS_BUILD_DIR}
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_COMPILER="${COMPILER}" ..
+  - make
+  - ./bin/tests
