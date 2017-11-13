@@ -1,5 +1,9 @@
+/doxygen/
 /build*
 *.kdev4
+
+CMakeLists.txt
+!/CMakeLists.txt
 
 # Prerequisites
 *.d

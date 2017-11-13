@@ -18,6 +18,8 @@
 
 #include "spvCfg.hpp"
 #include "CommandLineParser.hpp"
+#include "Config.hpp"
+#include "StageBase.hpp"
 
 namespace spirvPacker {
 
@@ -25,7 +27,11 @@ enum class SpirvExecuteResult { SUCCESS, ERROR };
 
 class SpirvPacker final {
  private:
-  CommandLineParser vCMDParser;
+  CommandLineParser                       vCMDParser;
+  std::vector<std::shared_ptr<StageBase>> vStages;
+  std::shared_ptr<ConfigSection>          vRootCfg = nullptr;
+
+  bool vIsInitialized = false;
 
  public:
   SpirvPacker() = default;
@@ -35,6 +41,13 @@ class SpirvPacker final {
 
   SpirvPacker(SpirvPacker &&) = delete;
   SpirvPacker &operator=(SpirvPacker &&) = delete;
+
+  bool initializeStages(std::shared_ptr<ConfigSection> _rootCfg);
+  bool addStage(std::shared_ptr<StageBase> _stage);
+
+  inline bool getIsInitialized() const noexcept {
+    return vIsInitialized;
+  } //!< Returns whether all stages are initialzed
 
   SpirvExecuteResult run(int argc, char *argv[]);
 };

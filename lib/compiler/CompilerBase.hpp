@@ -17,16 +17,17 @@
 #pragma once
 
 #include "spvCfg.hpp"
+#include "StageBase.hpp"
 
 namespace spirvPacker {
 
-class CompilerBase {
+class CompilerBase : public StageBase {
  private:
  public:
   CompilerBase() = default;
-  virtual ~CompilerBase();
+  ~CompilerBase() override;
 
-  virtual void getCompilerDescription() = 0;
+  StageType getStageType() const noexcept override { return StageType::COMPILER; }
 };
 
 } // namespace spirvPacker

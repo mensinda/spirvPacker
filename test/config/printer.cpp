@@ -64,6 +64,8 @@ SCENARIO("Printing the current config to a string", "[cfg]") {
       lRoot["testSec"]["content"]("str")    = "Hello World"_str;
       lRoot["testSec"]["content"]("int")    = 42l;
 
+      REQUIRE(lRoot.validate() == true);
+
       lRoot.accept(&lPrinter);
 
       THEN("these values should appear in the printed string") {

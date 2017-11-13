@@ -21,29 +21,11 @@
 namespace spirvPacker {
 
 /*!
- * \brief Defines enumerations for all supported shader stages
+ * \brief Represents an entire shader
  */
-enum class ShaderType {
-  VERTEX,   //!< The Vertex shader stage
-  TESS_CON, //!< The tesselation control shader stage
-  TESS_EVA, //!< The tesselation evaluation shader stage
-  GEOMETRY, //!< The geometry shader stage
-  FRAGMENT, //!< The fragment shader stage
-  COMPUTE   //!< The compute shader stage
-};
-
-/*!
- * \brief Stores all information of a shader module
- */
-class ShaderModule final {
- private:
-  ShaderType vType;
-
+class Shader final {
  public:
-  ShaderModule() = delete;
-  ShaderModule(ShaderType _type);
-
-  inline ShaderType getType() const noexcept { return vType; } //!< Returns the type of the shader (see ShaderType)
+  Shader() = default;
 };
 
 } // namespace spirvPacker

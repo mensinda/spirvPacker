@@ -15,12 +15,6 @@
  */
 
 #include "spvCfg.hpp"
-#include "ShaderModule.hpp"
+#include "Shader.hpp"
 
 using namespace spirvPacker;
-
-/*!
- * \brief Initializes the shader module with the type
- * \param _type the type of the shader module
- */
-ShaderModule::ShaderModule(ShaderType _type) : vType(_type) {}

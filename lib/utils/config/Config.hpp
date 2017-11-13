@@ -54,22 +54,29 @@ class ConfigNode {
 
 
 
+/*!
+ * \brief A config entry. Leave of a config tree
+ *
+ * The config data is stored in a variant and supports strings, integers, doubles, booleans and arrays
+ */
 class ConfigEntry final : public ConfigNode {
  public:
-  typedef std::variant<std::string, long int, double, bool> ARRAY_VAL_TYPE;
+  typedef std::variant<std::string, long int, double, bool> ARRAY_VAL_TYPE; //!< Variant type for array elements
+
+  //! \brief Structure for striring array elements
   struct ArrayType {
-    size_t                      index;
-    std::vector<ARRAY_VAL_TYPE> array;
+    size_t                      index; //!< The variant index all array elements must have
+    std::vector<ARRAY_VAL_TYPE> array; //!< The elemets
   };
 
-  static const size_t STR_TYPE    = 0;
-  static const size_t INT_TYPE    = 1;
-  static const size_t DOUBLE_TYPE = 2;
-  static const size_t BOOL_TYPE   = 3;
-  static const size_t ARRAY_TYPE  = 4;
+  static const size_t STR_TYPE    = 0; //!< Variant index for std::string
+  static const size_t INT_TYPE    = 1; //!< Variant index for long int
+  static const size_t DOUBLE_TYPE = 2; //!< Variant index for double
+  static const size_t BOOL_TYPE   = 3; //!< Variant index for bool
+  static const size_t ARRAY_TYPE  = 4; //!< Variant index for ArrayType
 
-  typedef std::function<bool(ConfigEntry const *)>                     FUNCTION;
-  typedef std::variant<std::string, long int, double, bool, ArrayType> VAL_TYPE;
+  typedef std::function<bool(ConfigEntry const *)>                     FUNCTION; //!< Custom validation function type
+  typedef std::variant<std::string, long int, double, bool, ArrayType> VAL_TYPE; //!< Entry variant type
 
  private:
   VAL_TYPE vDefaultValue;
@@ -100,10 +107,10 @@ class ConfigEntry final : public ConfigNode {
   inline VAL_TYPE value() const noexcept { return vValue; }
   inline VAL_TYPE operator*() const noexcept { return vValue; }
 
-  inline std::string valStr() const { return std::get<std::string>(vValue); }
-  inline long int    valInt() const { return std::get<long int>(vValue); }
-  inline double      valDouble() const { return std::get<double>(vValue); }
-  inline bool        valBool() const { return std::get<bool>(vValue); }
+  inline std::string valStr() const { return std::get<std::string>(vValue); } //!< Get the value as a string. \throws
+  inline long int    valInt() const { return std::get<long int>(vValue); }    //!< Get the value as a int. \throws
+  inline double      valDouble() const { return std::get<double>(vValue); }   //!< Get the value as a double. \throws
+  inline bool        valBool() const { return std::get<bool>(vValue); }       //!< Get the value as a bool. \throws
 
   // Array operations only
   inline ARRAY_VAL_TYPE valArray(size_t _i) { return std::get<ArrayType>(vValue).array[_i]; }
