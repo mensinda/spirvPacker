@@ -87,6 +87,7 @@ ConfigSection &StageBase::getStageBaseConfigSection() {
       case StageType::INTERPRETER: return "interpreter";
       case StageType::GENERATOR: return "generator";
     }
+    return "<UNKNOWN>"; // should be unreachable but gcc complains
   }();
 
   // Add section wil also return an already existing section
