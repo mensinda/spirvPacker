@@ -16,6 +16,7 @@
 
 #include "Config.hpp"
 #include "ConfigPrinter.hpp"
+#include "DefaultInput.hpp"
 #include "SpirvPacker.hpp"
 #include <iostream>
 
@@ -24,19 +25,25 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   SpirvPacker   lPacker;
-  ConfigSection lCfg;
+  auto          lCfg = make_shared<ConfigSection>();
   ConfigPrinter lPrinter;
+  Shader        lShader;
 
-  auto &lSec = lCfg.addSection("basic");
-  lSec.addEntry("verbose", false);
-  lSec.addEntry("version", false);
-  lSec.addEntry("outName", "Help"_str);
+  (void)argc;
+  (void)argv;
 
-  lCfg["basic"]("verbose") = true;
+  lPacker.addStage(make_shared<DefaultInput>());
+  lPacker.initializeStages(lCfg);
 
-  lCfg.accept(&lPrinter);
+  (*lCfg)["base"]("name")                       = "triangle1"_str;
+  (*lCfg)["stages"]("input")                    = "defaultInput"_str;
+  (*lCfg)["input"]["defaultInput"]("directory") = SOURCE_DIR + "/test/data"_str;
 
+  bool lValRes = lCfg->validate();
+  cout << "Validation: " << (lValRes ? "true" : "false") << endl << endl;
+
+  lCfg->accept(&lPrinter);
   cout << lPrinter.getResult() << endl;
 
-  return lPacker.run(argc, argv) == SpirvExecuteResult::SUCCESS ? 0 : 1;
+  return lPacker.run(&lShader) == SpirvExecuteResult::SUCCESS ? 0 : 1;
 }

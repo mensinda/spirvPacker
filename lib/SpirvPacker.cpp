@@ -16,8 +16,11 @@
 
 #include "spvCfg.hpp"
 #include "SpirvPacker.hpp"
+#include <algorithm>
+#include <iostream>
 
 using namespace spirvPacker;
+using namespace std;
 
 bool SpirvPacker::initializeStages(std::shared_ptr<ConfigSection> _rootCfg) {
   if (vIsInitialized) {
@@ -37,6 +40,21 @@ bool SpirvPacker::initializeStages(std::shared_ptr<ConfigSection> _rootCfg) {
   lCfgLog.addEntry("enable", true);
   lCfgLog.addEntry("writeToFile", false);
   lCfgLog.addEntry("logFile", ""_str);
+
+  auto &lBase = vRootCfg->addSection("base");
+  lBase.addEntry("name", ""_str, [](ConfigEntry const *e) { return !e->valStr().empty(); });
+
+  auto &lStages = vRootCfg->addSection("stages");
+
+  for (StageType i : {StageType::INPUT_FINDER,
+                      StageType::COMPILER,
+                      StageType::OPTIMIZER,
+                      StageType::DISASSEMBLE,
+                      StageType::INTERPRETER,
+                      StageType::GENERATOR}) {
+    lStages.addEntry(StageBase::stageTypeToString(i), ""_str);
+  }
+
 
   for (auto &i : vStages) {
     if (!i->initialize(_rootCfg)) {
@@ -77,12 +95,50 @@ bool SpirvPacker::addStage(std::shared_ptr<StageBase> _stage) {
 
 
 
-SpirvExecuteResult SpirvPacker::run(int argc, char *argv[]) {
-  auto lRes = vCMDParser.parse(argc, argv);
-  switch (lRes) {
-    case CMDParseResult::ERROR: return SpirvExecuteResult::ERROR;
-    case CMDParseResult::EXIT_OK: return SpirvExecuteResult::SUCCESS;
-    case CMDParseResult::OK: break;
+SpirvExecuteResult SpirvPacker::run(Shader *_s) {
+  if (!_s) {
+    cerr << "Shader may not be nullptr" << endl;
+    return SpirvExecuteResult::ERROR;
+  }
+
+  if (!vRootCfg->validate()) {
+    cerr << "Invalid configuration" << endl;
+    return SpirvExecuteResult::INVALID_CONFIG;
+  }
+
+  for (StageType i : {StageType::INPUT_FINDER,
+                      StageType::COMPILER,
+                      StageType::OPTIMIZER,
+                      StageType::DISASSEMBLE,
+                      StageType::INTERPRETER,
+                      StageType::GENERATOR}) {
+    string lStageStr = StageBase::stageTypeToString(i);
+    string lStageID  = (*vRootCfg)["stages"](lStageStr).valStr();
+
+    if (lStageID.empty())
+      continue;
+
+    // Get the stage pointer from the config string
+    StageBase *lStage = nullptr;
+    auto lFindResult  = find_if(begin(vStages), end(vStages), [=](auto const &t) { return lStageID == t->getName(); });
+    if (lFindResult == end(vStages)) {
+      cerr << "Stage " << lStageID << " not found" << endl;
+      return SpirvExecuteResult::STAGE_NOT_FOUND;
+    }
+
+    lStage = lFindResult->get();
+    if (lStage->getStageType() != i) {
+      cerr << "Stage '" << lStage->getName() << "' is a " << StageBase::stageTypeToString(lStage->getStageType())
+           << " stage not a " << lStageStr << " stage" << endl;
+      return SpirvExecuteResult::STAGE_NOT_FOUND;
+    }
+
+    // Run the stage
+    cout << "Stage " << lStageStr << ": " << lStageID << endl;
+
+    if (lStage->run(_s) != StageResult::SUCCESS) {
+      return SpirvExecuteResult::ERROR;
+    }
   }
 
   return SpirvExecuteResult::SUCCESS;

@@ -72,6 +72,13 @@ SCENARIO("Using the StageBase class", "[framework]") {
         REQUIRE_NOTHROW((*lRoot)["interpreter"]["Interp_5"]);
         REQUIRE_NOTHROW((*lRoot)["generator"]["GENERATOR_6"]);
       }
+
+      THEN("the configuration can be queried") {
+        for (auto i : {&lInput, &lCompiler, &lOptimizer, &lDiss, &lInterpreter, &lGenerator}) {
+          REQUIRE_NOTHROW(i->getRootConfigSection());
+          REQUIRE_NOTHROW(i->getStageBaseConfigSection());
+        }
+      }
     }
   }
 

@@ -69,6 +69,18 @@ ConfigSection &StageBase::getRootConfigSection() {
   return *vRootCfg;
 }
 
+std::string StageBase::stageTypeToString(StageType _type) {
+  switch (_type) {
+    case StageType::INPUT_FINDER: return "input";
+    case StageType::COMPILER: return "compiler";
+    case StageType::OPTIMIZER: return "optimizer";
+    case StageType::DISASSEMBLE: return "disassemble";
+    case StageType::INTERPRETER: return "interpreter";
+    case StageType::GENERATOR: return "generator";
+  }
+  return "<UNKNOWN>"; // should be unreachable but gcc complains
+}
+
 /*!
  * \brief Returns the base config section of the stage
  * \throws std::runtime_error when not yet initialized
@@ -78,17 +90,7 @@ ConfigSection &StageBase::getStageBaseConfigSection() {
     throw std::runtime_error(getName() + " not yet initialized");
   }
 
-  std::string lCategoryName = [=]() {
-    switch (getStageType()) {
-      case StageType::INPUT_FINDER: return "input";
-      case StageType::COMPILER: return "compiler";
-      case StageType::OPTIMIZER: return "optimizer";
-      case StageType::DISASSEMBLE: return "disassemble";
-      case StageType::INTERPRETER: return "interpreter";
-      case StageType::GENERATOR: return "generator";
-    }
-    return "<UNKNOWN>"; // should be unreachable but gcc complains
-  }();
+  std::string lCategoryName = stageTypeToString(getStageType());
 
   // Add section wil also return an already existing section
   return vRootCfg->addSection(lCategoryName).addSection(getName());

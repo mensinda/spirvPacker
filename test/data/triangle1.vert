@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Daniel Mensinger
+ * Copyright (C) 2015 EEnginE project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,25 @@
  * limitations under the License.
  */
 
-#include "spvCfg.hpp"
-#include "ShaderModule.hpp"
+#version 450
 
-using namespace spirvPacker;
+layout (location = 0) in vec3 iVertex;
+layout (location = 1) in vec3 iNormals;
+layout (location = 2) in vec2 iUV;
+
+layout (set = 0, binding = 0) uniform UBuffer {
+  mat4 mvp;
+  float lodBias;
+  mat3 normal;
+} uBuff;
+
+layout (location = 0) out vec3  vNormals;
+layout (location = 1) out vec2  vUV;
+layout (location = 2) out float vLodBias;
+
+void main() {
+   vLodBias = uBuff.lodBias;
+   vNormals = uBuff.normal * iNormals;
+   vUV = iUV;
+   gl_Position = uBuff.mvp * vec4(iVertex, 1.0);
+}

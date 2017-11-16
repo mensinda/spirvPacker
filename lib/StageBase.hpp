@@ -33,9 +33,10 @@ enum class StageType {
 };
 
 enum class StageResult {
-  SUCCESS,     //!< \brief Everything went fine
-  ERROR,       //!< \brief Some generic error occurred.
-  DATA_MISSING //!< \brief A previous stage was skipped or has not written any / enough data.
+  SUCCESS,      //!< \brief Everything went fine
+  ERROR,        //!< \brief Some generic error occurred.
+  DATA_MISSING, //!< \brief A previous stage was skipped or has not written any / enough data.
+  IO_ERROR,     //!< \brief Reading / writing data failed
 };
 
 /*!
@@ -62,6 +63,8 @@ class StageBase {
   virtual StageResult run(Shader *_shader)          = 0;
 
   bool initialize(std::shared_ptr<ConfigSection> _rootCfg);
+
+  static std::string stageTypeToString(StageType _type);
 
   ConfigSection &getStageBaseConfigSection();
   ConfigSection &getRootConfigSection();

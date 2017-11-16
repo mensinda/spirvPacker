@@ -17,6 +17,8 @@
 #pragma once
 
 #include "spvCfg.hpp"
+#include "ShaderModule.hpp"
+#include <array>
 
 namespace spirvPacker {
 
@@ -24,8 +26,14 @@ namespace spirvPacker {
  * \brief Represents an entire shader
  */
 class Shader final {
+ private:
+  std::array<ShaderModule, static_cast<size_t>(ShaderType::__NUM__)> vModules;
+
  public:
   Shader() = default;
+
+  inline ShaderModule &getModule(ShaderType _t) noexcept { return vModules[static_cast<size_t>(_t)]; }
+  inline ShaderModule &operator[](ShaderType _t) noexcept { return vModules[static_cast<size_t>(_t)]; }
 };
 
 } // namespace spirvPacker

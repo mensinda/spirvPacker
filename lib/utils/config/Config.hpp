@@ -39,8 +39,8 @@ class ConfigNode {
   ConfigNode(ConfigNode *vParent, std::string _name);
   virtual ~ConfigNode();
 
-  ConfigNode(ConfigNode const &) = default;
-  ConfigNode &operator=(const ConfigNode &) = default;
+  ConfigNode(ConfigNode const &) = delete;
+  ConfigNode &operator=(const ConfigNode &) = delete;
 
   ConfigNode(ConfigNode &&) = default;
   ConfigNode &operator=(ConfigNode &&) = default;
@@ -87,8 +87,8 @@ class ConfigEntry final : public ConfigNode {
   ConfigEntry(ConfigNode *_parent, std::string _name, VAL_TYPE _devVal, FUNCTION _validate)
       : ConfigNode(_parent, _name), vDefaultValue(_devVal), vValue(vDefaultValue), vValidata(_validate) {}
 
-  ConfigEntry(ConfigEntry const &) = default;
-  ConfigEntry &operator=(const ConfigEntry &) = default;
+  ConfigEntry(ConfigEntry const &) = delete;
+  ConfigEntry &operator=(const ConfigEntry &) = delete;
 
   ConfigEntry(ConfigEntry &&) = default;
   ConfigEntry &operator=(ConfigEntry &&) = default;
@@ -132,16 +132,15 @@ class ConfigEntry final : public ConfigNode {
 
 class ConfigSection final : public ConfigNode {
  private:
-  std::vector<ConfigSection> vSubSections;
-  std::vector<ConfigEntry>   vEntries;
-
-  ConfigSection(ConfigNode *_parent, std::string _name);
+  std::vector<std::unique_ptr<ConfigSection>> vSubSections;
+  std::vector<std::unique_ptr<ConfigEntry>>   vEntries;
 
  public:
+  ConfigSection(ConfigNode *_parent, std::string _name);
   ConfigSection(std::string _name = "config");
 
-  ConfigSection(ConfigSection const &) = default;
-  ConfigSection &operator=(const ConfigSection &) = default;
+  ConfigSection(ConfigSection const &) = delete;
+  ConfigSection &operator=(const ConfigSection &) = delete;
 
   ConfigSection(ConfigSection &&) = default;
   ConfigSection &operator=(ConfigSection &&) = default;

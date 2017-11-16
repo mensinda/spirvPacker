@@ -27,13 +27,17 @@ class StageImpl final : public StageBase {
   StageType   vType                  = StageType::INPUT_FINDER;
   bool        vInitializeReturnValue = true;
   StageResult vRunReturnValue        = StageResult::SUCCESS;
+  bool        vRan                   = false;
 
  public:
   StageImpl() = default;
   std::string getName() const noexcept override { return vName; }
   StageType   getStageType() const noexcept override { return vType; }
   bool        initializeStage() override { return vInitializeReturnValue; }
-  StageResult run(spirvPacker::Shader *) override { return vRunReturnValue; }
+  StageResult run(spirvPacker::Shader *) override {
+    vRan = true;
+    return vRunReturnValue;
+  }
 };
 
 SCENARIO("testing the SpirvPacker class initialisation", "[framework]") {
@@ -83,6 +87,73 @@ SCENARIO("testing the SpirvPacker class initialisation", "[framework]") {
     THEN("adding the same stages twice fails") {
       REQUIRE(lPacker.addStage(lStage) == true);
       REQUIRE(lPacker.addStage(lStage) == false);
+    }
+  }
+}
+
+SCENARIO("running a stage", "[framework]") {
+  GIVEN("a valid stage, a config, a shader and a SpirvPacker object") {
+    SpirvPacker lPacker;
+    Shader      lShader;
+    auto        lStage = std::make_shared<StageImpl>();
+    auto        lCfg   = std::make_shared<ConfigSection>();
+
+    REQUIRE(lPacker.addStage(lStage) == true);
+    REQUIRE(lPacker.initializeStages(lCfg) == true);
+
+    (*lCfg)["base"]("name") = "test"_str;
+    REQUIRE(lCfg->validate() == true);
+
+    THEN("running the packer succeeds") { REQUIRE(lPacker.run(&lShader) == SpirvExecuteResult::SUCCESS); }
+
+    WHEN("the config is invalid") {
+      (*lCfg)["base"]("name") = ""_str; // Invalidates config
+      REQUIRE(lCfg->validate() == false);
+
+      THEN("the packer fails with invalid config") {
+        REQUIRE(lPacker.run(&lShader) == SpirvExecuteResult::INVALID_CONFIG);
+      }
+    }
+
+    WHEN("the stage is correctly enabled in the config") {
+      (*lCfg)["stages"]("input") = "Test"_str;
+      lStage->vRan               = false;
+
+      THEN("running the packer succeeds") {
+        REQUIRE(lPacker.run(&lShader) == SpirvExecuteResult::SUCCESS);
+        REQUIRE(lStage->vRan == true);
+      }
+    }
+
+    WHEN("the stage is correctly enabled in the config but executing the stage fails") {
+      (*lCfg)["stages"]("input") = "Test"_str;
+      lStage->vRan               = false;
+      lStage->vRunReturnValue    = StageResult::ERROR;
+
+      THEN("running the packer succeeds") {
+        REQUIRE(lPacker.run(&lShader) == SpirvExecuteResult::ERROR);
+        REQUIRE(lStage->vRan == true);
+      }
+    }
+
+    WHEN("the stage is incorrectly enabled in the config") {
+      (*lCfg)["stages"]("compiler") = "Test"_str;
+      lStage->vRan                  = false;
+
+      THEN("running the packer fails with STAGE_NOT_FOUND") {
+        REQUIRE(lPacker.run(&lShader) == SpirvExecuteResult::STAGE_NOT_FOUND);
+        REQUIRE(lStage->vRan == false);
+      }
+    }
+
+    WHEN("the stage ID string in the config is incorrect") {
+      (*lCfg)["stages"]("compiler") = "sffgafgadfagav"_str;
+      lStage->vRan                  = false;
+
+      THEN("running the packer fails with STAGE_NOT_FOUND") {
+        REQUIRE(lPacker.run(&lShader) == SpirvExecuteResult::STAGE_NOT_FOUND);
+        REQUIRE(lStage->vRan == false);
+      }
     }
   }
 }

@@ -67,7 +67,7 @@ new_project_library(
   PATH         "${PROJECT_SOURCE_DIR}/lib"
   NAME         "${PROJECT_NAME}"
   TEMPLATE     "${TEMPLATES_DIR}/CMakeLists.lib.in"
-  DEPENDENCIES
+  DEPENDENCIES stdc++fs
 )
 
 new_project_executable(

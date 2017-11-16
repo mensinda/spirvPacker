@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Daniel Mensinger
+ * Copyright (C) 2015 EEnginE project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 
-#include "spvCfg.hpp"
-#include "ShaderModule.hpp"
+#version 450
 
-using namespace spirvPacker;
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_shading_language_420pack : enable
+
+layout (set = 0, binding = 1) uniform sampler2D samplerDiffuse;
+
+layout (location = 0) in vec3 vNormals;
+layout (location = 1) in vec2 vUV;
+layout (location = 2) in float vLodBias;
+layout (location = 0) out vec4 outFragColor;
+
+void main()
+{
+  outFragColor = texture(samplerDiffuse, vUV, vLodBias);
+}

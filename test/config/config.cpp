@@ -34,8 +34,8 @@ SCENARIO("Setting and reading config entries", "[cfg]") {
     }
 
     WHEN("adding sections and entries") {
-      auto lSec   = lRoot.addSection("test");
-      auto lEntry = lRoot.addEntry("test2", true);
+      auto &lSec   = lRoot.addSection("test");
+      auto &lEntry = lRoot.addEntry("test2", true);
 
       THEN("the structure should be valid") {
         REQUIRE(lSec.getName() == "test");

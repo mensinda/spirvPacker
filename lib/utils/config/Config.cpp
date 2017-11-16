@@ -25,6 +25,7 @@ using namespace std;
 ConfigNode::ConfigNode(ConfigNode *_parent, std::string _name) : vParent(_parent), vName(_name) {}
 ConfigNode::~ConfigNode() {}
 
+
 std::string ConfigNode::genPath() const noexcept {
   if (!vParent)
     return vName;
@@ -64,21 +65,21 @@ ConfigSection::ConfigSection(ConfigNode *_parent, std::string _name) : ConfigNod
 ConfigSection::ConfigSection(std::string _name) : ConfigNode(nullptr, _name) {}
 
 ConfigEntry &ConfigSection::operator()(std::string _name) {
-  auto lFindRes = find_if(begin(vEntries), end(vEntries), [=](auto const &t) { return _name == t.getName(); });
+  auto lFindRes = find_if(begin(vEntries), end(vEntries), [=](auto const &t) { return _name == t->getName(); });
 
   if (lFindRes == end(vEntries))
     throw std::runtime_error("Config entry '" + _name + "' does not exist in '" + genPath() + "'");
 
-  return *lFindRes;
+  return **lFindRes;
 }
 
 ConfigSection &ConfigSection::operator[](std::string _name) {
-  auto lFindRes = find_if(begin(vSubSections), end(vSubSections), [=](auto const &t) { return _name == t.getName(); });
+  auto lFindRes = find_if(begin(vSubSections), end(vSubSections), [=](auto const &t) { return _name == t->getName(); });
 
   if (lFindRes == end(vSubSections))
     throw std::runtime_error("Subsection '" + _name + "' does not exist in '" + genPath() + "'");
 
-  return *lFindRes;
+  return **lFindRes;
 }
 
 /*!
@@ -88,11 +89,11 @@ bool ConfigSection::accept(ConfigVisitor *_vis) {
   if (_vis->visitEnter(this)) {
 
     for (auto &i : vEntries)
-      if (!i.accept(_vis))
+      if (!i->accept(_vis))
         return _vis->visitLeave(this);
 
     for (auto &i : vSubSections)
-      if (!i.accept(_vis))
+      if (!i->accept(_vis))
         return _vis->visitLeave(this);
   }
 
@@ -104,11 +105,11 @@ bool ConfigSection::accept(ConfigVisitor *_vis) {
  */
 bool ConfigSection::validate() const {
   for (auto const &i : vSubSections)
-    if (!i.validate())
+    if (!i->validate())
       return false;
 
   for (auto const &i : vEntries)
-    if (!i.validate())
+    if (!i->validate())
       return false;
 
   return true;
@@ -120,26 +121,26 @@ bool ConfigSection::validate() const {
 ConfigEntry &ConfigSection::addEntry(std::string           _name,
                                      ConfigEntry::VAL_TYPE _devVal,
                                      ConfigEntry::FUNCTION _validate) {
-  auto lFindRes = find_if(begin(vEntries), end(vEntries), [=](auto const &t) { return _name == t.getName(); });
+  auto lFindRes = find_if(begin(vEntries), end(vEntries), [=](auto const &t) { return _name == t->getName(); });
 
   if (lFindRes == end(vEntries)) {
-    vEntries.emplace_back(this, _name, _devVal, _validate);
-    return vEntries.back();
+    vEntries.emplace_back(std::make_unique<ConfigEntry>(this, _name, _devVal, _validate));
+    return *vEntries.back();
   }
 
-  return *lFindRes;
+  return **lFindRes;
 }
 
 /*!
  * Creates a new config section or returns an existing one
  */
 ConfigSection &ConfigSection::addSection(std::string _name) {
-  auto lFindRes = find_if(begin(vSubSections), end(vSubSections), [=](auto const &t) { return _name == t.getName(); });
+  auto lFindRes = find_if(begin(vSubSections), end(vSubSections), [=](auto const &t) { return _name == t->getName(); });
 
   if (lFindRes == end(vSubSections)) {
-    vSubSections.push_back(ConfigSection(this, _name));
-    return vSubSections.back();
+    vSubSections.emplace_back(std::make_unique<ConfigSection>(this, _name));
+    return *vSubSections.back();
   }
 
-  return *lFindRes;
+  return **lFindRes;
 }

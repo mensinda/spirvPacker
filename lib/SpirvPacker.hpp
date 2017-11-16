@@ -23,11 +23,11 @@
 
 namespace spirvPacker {
 
-enum class SpirvExecuteResult { SUCCESS, ERROR };
+enum class SpirvExecuteResult { SUCCESS, ERROR, STAGE_NOT_FOUND, INVALID_CONFIG };
 
 class SpirvPacker final {
  private:
-  CommandLineParser                       vCMDParser;
+  //   CommandLineParser                       vCMDParser;
   std::vector<std::shared_ptr<StageBase>> vStages;
   std::shared_ptr<ConfigSection>          vRootCfg = nullptr;
 
@@ -49,7 +49,7 @@ class SpirvPacker final {
     return vIsInitialized;
   } //!< Returns whether all stages are initialzed
 
-  SpirvExecuteResult run(int argc, char *argv[]);
+  SpirvExecuteResult run(Shader *_s);
 };
 
 } // namespace spirvPacker
