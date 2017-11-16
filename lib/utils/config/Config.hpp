@@ -19,6 +19,7 @@
 #include "spvCfg.hpp"
 #include "ConfigVisitor.hpp"
 #include <functional>
+#include <memory>
 #include <string>
 #include <variant>
 #include <vector>
