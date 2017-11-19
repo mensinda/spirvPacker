@@ -48,8 +48,7 @@ bool DefaultInput::initializeStage() {
 }
 
 StageResult DefaultInput::run(Shader *_shader) {
-  (void)_shader;
-
+  auto  lLogger = getLogger();
   auto &lCfg    = getStageBaseConfigSection();
   auto &lExtSec = lCfg["extensions"];
 
@@ -61,7 +60,7 @@ StageResult DefaultInput::run(Shader *_shader) {
   string   lDir     = lCfg("directory").valStr();
   fs::path lDirPath = lDir;
   if (!fs::exists(lDirPath) || !fs::is_directory(lDirPath)) {
-    cerr << "Directory " << lDir << " does not exist" << endl;
+    lLogger->error("Directory '{}' does not exist", lDir);
     return StageResult::IO_ERROR;
   }
 
@@ -83,7 +82,7 @@ StageResult DefaultInput::run(Shader *_shader) {
     for (auto j : lExts) {
       fs::path lToTest = lDir + "/" + lName + "." + j;
       if (fs::exists(lToTest) && fs::is_regular_file(lToTest)) {
-        cout << "Found " << lToTest.string() << endl;
+        lLogger->info("Found module {}", lToTest.string());
         ShaderModule &lModule = _shader->getModule(get<0>(i));
         lModule.setType(get<0>(i));
         lModule.setSourcePath(lToTest.string());

@@ -36,8 +36,9 @@ std::string ConfigNode::genPath() const noexcept {
 
 
 bool ConfigEntry::validate() const {
+  auto lLogger = getLogger();
   if (vValue.index() != vDefaultValue.index()) {
-    std::cerr << "Config validation failed: Invalid type for " << genPath() << std::endl;
+    lLogger->error("Config validation failed: Invalid type for '{}'", genPath());
     return false;
   }
 
@@ -45,7 +46,7 @@ bool ConfigEntry::validate() const {
     ArrayType const &lData = std::get<ArrayType>(vValue);
     for (auto const &i : lData.array) {
       if (i.index() != lData.index) {
-        std::cerr << "Config validation failed: Invalid type for array element in " << genPath() << std::endl;
+        lLogger->error("Config validation failed: Invalid type for array element in '{}'", genPath());
         return false;
       }
     }
@@ -54,7 +55,7 @@ bool ConfigEntry::validate() const {
   bool lRes = vValidata(this);
 
   if (!lRes)
-    std::cerr << "Config validation failed: Custom validation function failed for " << genPath() << std::endl;
+    lLogger->error("Config validation failed: Custom validation function failed for '{}'", genPath());
 
   return lRes;
 }
@@ -62,7 +63,6 @@ bool ConfigEntry::validate() const {
 
 
 ConfigSection::ConfigSection(ConfigNode *_parent, std::string _name) : ConfigNode(_parent, _name) {}
-ConfigSection::ConfigSection(std::string _name) : ConfigNode(nullptr, _name) {}
 
 ConfigEntry &ConfigSection::operator()(std::string _name) {
   auto lFindRes = find_if(begin(vEntries), end(vEntries), [=](auto const &t) { return _name == t->getName(); });

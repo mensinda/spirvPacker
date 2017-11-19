@@ -22,16 +22,18 @@
 using namespace spirvPacker;
 using namespace std;
 
-bool SpirvPacker::initializeStages(std::shared_ptr<ConfigSection> _rootCfg) {
+bool SpirvPacker::initializeStages(std::shared_ptr<Config> _rootCfg) {
+  auto lLogger = getLogger();
+
   if (vIsInitialized) {
-    //! \todo log this
+    lLogger->error("SpirvPacker is already initialized");
     return false;
   }
 
   vRootCfg = _rootCfg;
 
   if (!vRootCfg) {
-    //! \todo log this
+    lLogger->error("Invalid configuration");
     return false;
   }
 
@@ -58,7 +60,7 @@ bool SpirvPacker::initializeStages(std::shared_ptr<ConfigSection> _rootCfg) {
 
   for (auto &i : vStages) {
     if (!i->initialize(_rootCfg)) {
-      //! \todo log this
+      lLogger->error("Initializing {} stage '{}'", StageBase::stageTypeToString(i->getStageType()), i->getName());
       return false;
     }
   }
@@ -71,19 +73,21 @@ bool SpirvPacker::initializeStages(std::shared_ptr<ConfigSection> _rootCfg) {
  * \brief Adds a stage to the packer process
  */
 bool SpirvPacker::addStage(std::shared_ptr<StageBase> _stage) {
+  auto lLogger = getLogger();
+
   if (vIsInitialized) {
-    //! \todo log
+    lLogger->error("SpirvPacker is already initialized");
     return false;
   }
 
   if (!_stage) {
-    //! \todo log this
+    lLogger->error("Invalid stage pointer");
     return false;
   }
 
   for (auto &i : vStages) {
     if (i->getName() == _stage->getName()) {
-      //! \todo log this
+      lLogger->warn("Stage {} already exists", i->getName());
       return false;
     }
   }
@@ -96,13 +100,15 @@ bool SpirvPacker::addStage(std::shared_ptr<StageBase> _stage) {
 
 
 SpirvExecuteResult SpirvPacker::run(Shader *_s) {
+  auto lLogger = getLogger();
+
   if (!_s) {
-    cerr << "Shader may not be nullptr" << endl;
+    lLogger->error("Shader may not be nullptr");
     return SpirvExecuteResult::ERROR;
   }
 
   if (!vRootCfg->validate()) {
-    cerr << "Invalid configuration" << endl;
+    lLogger->error("Invalid configuration");
     return SpirvExecuteResult::INVALID_CONFIG;
   }
 
@@ -122,19 +128,21 @@ SpirvExecuteResult SpirvPacker::run(Shader *_s) {
     StageBase *lStage = nullptr;
     auto lFindResult  = find_if(begin(vStages), end(vStages), [=](auto const &t) { return lStageID == t->getName(); });
     if (lFindResult == end(vStages)) {
-      cerr << "Stage " << lStageID << " not found" << endl;
+      lLogger->error("Stage '{}' not found", lStageID);
       return SpirvExecuteResult::STAGE_NOT_FOUND;
     }
 
     lStage = lFindResult->get();
     if (lStage->getStageType() != i) {
-      cerr << "Stage '" << lStage->getName() << "' is a " << StageBase::stageTypeToString(lStage->getStageType())
-           << " stage not a " << lStageStr << " stage" << endl;
+      lLogger->error("Stage '{}' is a {} stage but a {} stage is expected",
+                     lStage->getName(),
+                     StageBase::stageTypeToString(lStage->getStageType()),
+                     lStageStr);
       return SpirvExecuteResult::STAGE_NOT_FOUND;
     }
 
     // Run the stage
-    cout << "Stage " << lStageStr << ": " << lStageID << endl;
+    lLogger->info("Running {} stage: {}", lStageStr, lStageID);
 
     if (lStage->run(_s) != StageResult::SUCCESS) {
       return SpirvExecuteResult::ERROR;

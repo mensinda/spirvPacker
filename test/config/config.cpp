@@ -23,7 +23,7 @@ using namespace Catch::Matchers;
 
 SCENARIO("Setting and reading config entries", "[cfg]") {
   GIVEN("an empty, default config structure") {
-    ConfigSection lRoot;
+    Config lRoot;
 
     THEN("it should be default initialized") {
       REQUIRE(lRoot.getParent() == nullptr);
@@ -49,7 +49,7 @@ SCENARIO("Setting and reading config entries", "[cfg]") {
   }
 
   GIVEN("a basic config structure") {
-    ConfigSection lRoot;
+    Config lRoot;
 
     lRoot.addEntry("rootEntry", 12l, [](ConfigEntry const *e) { return std::get<long int>(e->value()) > 0; });
     lRoot.addEntry("boolTest", true);

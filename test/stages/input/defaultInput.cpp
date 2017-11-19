@@ -26,7 +26,7 @@ SCENARIO("testing the DefaultInput") {
   GIVEN("a config and the default input and a shader object") {
     DefaultInput lInput;
     Shader       lShader;
-    auto         lCfg = make_shared<ConfigSection>();
+    auto         lCfg = make_shared<Config>();
     (*lCfg).addSection("base").addEntry("name", "triangle1"_str);
 
     REQUIRE(lInput.initialize(lCfg) == true);

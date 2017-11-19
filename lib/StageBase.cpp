@@ -45,7 +45,7 @@ StageBase::~StageBase() {}
  * \brief Initializes the stage
  * \param _rootCfg The root of the config tree
  */
-bool StageBase::initialize(std::shared_ptr<ConfigSection> _rootCfg) {
+bool StageBase::initialize(std::shared_ptr<Config> _rootCfg) {
   vRootCfg = _rootCfg;
   if (!vRootCfg) {
     //! \todo log
@@ -61,7 +61,7 @@ bool StageBase::initialize(std::shared_ptr<ConfigSection> _rootCfg) {
  * \brief Returns the root entry of the config tree
  * \throws std::runtime_error when not yet initialized
  */
-ConfigSection &StageBase::getRootConfigSection() {
+Config &StageBase::getRootConfigSection() {
   if (!vRootCfg) {
     throw std::runtime_error(getName() + " not yet initialized");
   }

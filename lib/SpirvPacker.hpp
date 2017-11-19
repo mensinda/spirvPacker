@@ -29,7 +29,7 @@ class SpirvPacker final {
  private:
   //   CommandLineParser                       vCMDParser;
   std::vector<std::shared_ptr<StageBase>> vStages;
-  std::shared_ptr<ConfigSection>          vRootCfg = nullptr;
+  std::shared_ptr<Config>                 vRootCfg = nullptr;
 
   bool vIsInitialized = false;
 
@@ -42,7 +42,7 @@ class SpirvPacker final {
   SpirvPacker(SpirvPacker &&) = delete;
   SpirvPacker &operator=(SpirvPacker &&) = delete;
 
-  bool initializeStages(std::shared_ptr<ConfigSection> _rootCfg);
+  bool initializeStages(std::shared_ptr<Config> _rootCfg);
   bool addStage(std::shared_ptr<StageBase> _stage);
 
   inline bool getIsInitialized() const noexcept {

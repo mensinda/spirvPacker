@@ -49,7 +49,7 @@ enum class StageResult {
  */
 class StageBase {
  private:
-  std::shared_ptr<ConfigSection> vRootCfg = nullptr;
+  std::shared_ptr<Config> vRootCfg = nullptr;
 
  protected:
   virtual bool initializeStage() = 0;
@@ -62,12 +62,12 @@ class StageBase {
   virtual StageType   getStageType() const noexcept = 0;
   virtual StageResult run(Shader *_shader)          = 0;
 
-  bool initialize(std::shared_ptr<ConfigSection> _rootCfg);
+  bool initialize(std::shared_ptr<Config> _rootCfg);
 
   static std::string stageTypeToString(StageType _type);
 
   ConfigSection &getStageBaseConfigSection();
-  ConfigSection &getRootConfigSection();
+  Config &       getRootConfigSection();
 };
 
 } // namespace spirvPacker

@@ -14,5 +14,14 @@
  * limitations under the License.
  */
 
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
+#include "spvCfg.hpp"
 #include <catch.hpp>
+
+using namespace spirvPacker;
+
+int main(int argc, char *argv[]) {
+  getLogger()->set_level(spdlog::level::off);
+
+  return Catch::Session().run(argc, argv);
+}

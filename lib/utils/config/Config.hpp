@@ -131,14 +131,13 @@ class ConfigEntry final : public ConfigNode {
 
 
 
-class ConfigSection final : public ConfigNode {
+class ConfigSection : public ConfigNode {
  private:
   std::vector<std::unique_ptr<ConfigSection>> vSubSections;
   std::vector<std::unique_ptr<ConfigEntry>>   vEntries;
 
  public:
   ConfigSection(ConfigNode *_parent, std::string _name);
-  ConfigSection(std::string _name = "config");
 
   ConfigSection(ConfigSection const &) = delete;
   ConfigSection &operator=(const ConfigSection &) = delete;
@@ -163,6 +162,14 @@ class ConfigSection final : public ConfigNode {
 
   bool accept(ConfigVisitor *_vis) override;
   bool validate() const override;
+};
+
+
+
+
+class Config final : public ConfigSection {
+ public:
+  Config() : ConfigSection(nullptr, "config") {}
 };
 
 } // namespace spirvPacker

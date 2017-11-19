@@ -59,6 +59,8 @@ add_compiler( Clang MIN_VERSION "5.0"
               SANITIZE "-fsanitize=${SANITIZERS}"
               RELEASE  "-O2" )
 
+find_package( Threads REQUIRED )
+
 ##################
 # Config Project #
 ##################
@@ -67,7 +69,7 @@ new_project_library(
   PATH         "${PROJECT_SOURCE_DIR}/lib"
   NAME         "${PROJECT_NAME}"
   TEMPLATE     "${TEMPLATES_DIR}/CMakeLists.lib.in"
-  DEPENDENCIES stdc++fs
+  DEPENDENCIES stdc++fs Threads::Threads
 )
 
 new_project_executable(
@@ -93,6 +95,7 @@ include_directories(
 
 include_directories( SYSTEM
   ${PROJECT_SOURCE_DIR}/external/catch
+  ${PROJECT_SOURCE_DIR}/external/spdlog/include
 )
 
 # Add all libs and tests directories

@@ -25,7 +25,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   SpirvPacker   lPacker;
-  auto          lCfg = make_shared<ConfigSection>();
+  auto          lCfg = make_shared<Config>();
   ConfigPrinter lPrinter;
   Shader        lShader;
 

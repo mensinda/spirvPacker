@@ -42,7 +42,7 @@ class StageImpl final : public StageBase {
 
 SCENARIO("testing the SpirvPacker class initialisation", "[framework]") {
   GIVEN("a packer and a stage") {
-    auto        lCfg    = std::make_shared<ConfigSection>();
+    auto        lCfg    = std::make_shared<Config>();
     auto        lStage  = std::make_shared<StageImpl>();
     auto        lStage2 = std::make_shared<StageImpl>();
     SpirvPacker lPacker;
@@ -96,7 +96,7 @@ SCENARIO("running a stage", "[framework]") {
     SpirvPacker lPacker;
     Shader      lShader;
     auto        lStage = std::make_shared<StageImpl>();
-    auto        lCfg   = std::make_shared<ConfigSection>();
+    auto        lCfg   = std::make_shared<Config>();
 
     REQUIRE(lPacker.addStage(lStage) == true);
     REQUIRE(lPacker.initializeStages(lCfg) == true);
@@ -105,6 +105,10 @@ SCENARIO("running a stage", "[framework]") {
     REQUIRE(lCfg->validate() == true);
 
     THEN("running the packer succeeds") { REQUIRE(lPacker.run(&lShader) == SpirvExecuteResult::SUCCESS); }
+
+    WHEN("the shader is nullptr") {
+      THEN("the packer fails") { REQUIRE(lPacker.run(nullptr) == SpirvExecuteResult::ERROR); }
+    }
 
     WHEN("the config is invalid") {
       (*lCfg)["base"]("name") = ""_str; // Invalidates config

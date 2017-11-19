@@ -59,7 +59,7 @@ SCENARIO("Using the StageBase class", "[framework]") {
     lGenerator.vType   = StageType::GENERATOR;
 
     WHEN("initializing them") {
-      auto lRoot = std::make_shared<ConfigSection>();
+      auto lRoot = std::make_shared<Config>();
       for (auto i : {&lInput, &lCompiler, &lOptimizer, &lDiss, &lInterpreter, &lGenerator}) {
         i->initialize(lRoot);
       }

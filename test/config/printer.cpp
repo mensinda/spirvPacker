@@ -24,7 +24,7 @@ using namespace Catch::Matchers;
 
 SCENARIO("Printing the current config to a string", "[cfg]") {
   GIVEN("a basic config structure and a printer visitor") {
-    ConfigSection lRoot;
+    Config        lRoot;
     ConfigPrinter lPrinter;
 
     lRoot.addEntry("rootEntry", 12l);

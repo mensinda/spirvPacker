@@ -17,8 +17,30 @@
 
 #pragma once
 
+#define SPDLOG_TRACE_ON
+
+#include <spdlog/spdlog.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#define WIDEN2(x) L##x
+#define WIDEN(x) WIDEN2(x)
+
+#define W_FILE WIDEN(__FILE__)
+
+// Detect compiler function macro
+#if defined __clang__
+// #    define W_FUNC __PRETTY_FUNCTION__ // A bit to long ...
+#define W_FUNC __func__
+#elif defined __GNUC__
+// #    define W_FUNC __PRETTY_FUNCTION__ // A bit to long ...
+#define W_FUNC __func__
+#elif defined _MSC_VER
+// #    define W_FUNC __PRETTY_FUNCTION__ // A bit to long ...
+#define W_FUNC __FUNCTION__
+#else
+#define W_FUNC __func__
+#endif
 
 // clang-format off
 
@@ -32,8 +54,22 @@
 #define STD_FILESYSTEM_IS_EXPERIMENTAL true
 #define SOURCE_DIR "@PROJECT_SOURCE_DIR@"
 
-namespace spirvPacker {
-
-}
+#define SPDLOG_LOGGER_NAME   "spirvPacker"
+#define SPDLOG_FORMAT_STRING "(%d:%m:%C %H:%M:%S) [%L]: %v"
 
 // clang-format on
+
+namespace spirvPacker {
+
+inline std::shared_ptr<spdlog::logger> getLogger() {
+  std::shared_ptr<spdlog::logger> lLogger = spdlog::get(SPDLOG_LOGGER_NAME);
+
+  if (!lLogger) {
+    lLogger = spdlog::stdout_color_mt(SPDLOG_LOGGER_NAME);
+    lLogger->set_pattern(SPDLOG_FORMAT_STRING);
+  }
+
+  return lLogger;
+}
+
+} // namespace spirvPacker
