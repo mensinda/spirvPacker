@@ -55,6 +55,7 @@ install:
 
   # install glslang
   - cd "$HOME/glslang/build"
+  - git pull
   - ${CMAKE_EXE} -DCMAKE_INSTALL_PREFIX="$HOME/install" ..
   - make install
 
