@@ -44,8 +44,7 @@ before_install:
 
   # glslang
   - cd "$HOME/glslang"
-  - if [ -d build ]; then rm -rf build; fi
-  - mkdir build
+  - if [ ! -d build ]; then mkdir build; fi
 
 install:
   # install CMake
