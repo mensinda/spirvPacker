@@ -35,8 +35,8 @@ before_install:
   - mkdir "install"
 
   # init cache
-  - if [ ! -d "$HOME/cmakeTar" ]; then mkdir "$HOME/cmakeTar";                                  fi
-  - if [ ! -d "$HOME/glslang"  ]; then git clone "https://github.com/KhronosGroup/glslang.git"; fi
+  - if [ ! -d "cmakeTar"     ]; then mkdir "cmakeTar";                                                          fi
+  - if [ ! -e "glslang/.git" ]; then rm -rf "glslang"; git clone "https://github.com/KhronosGroup/glslang.git"; fi
 
   # CMake
   - cd "$HOME/cmakeTar"
