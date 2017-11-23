@@ -15,20 +15,27 @@
  */
 
 #include "spvCfg.hpp"
-#include "ShaderModule.hpp"
-#include <cstdio>
+#include "InputBase.hpp"
 
 using namespace spirvPacker;
 using namespace std;
 
-string ShaderModule::shaderType2Str(ShaderType _t) noexcept {
-  switch (_t) {
-    case ShaderType::VERTEX: return "vertex";
-    case ShaderType::TESS_CON: return "tessControl";
-    case ShaderType::TESS_EVA: return "tessEval";
-    case ShaderType::GEOMETRY: return "geometry";
-    case ShaderType::FRAGMENT: return "fragment";
-    case ShaderType::COMPUTE: return "compute";
-    default: return "<UNKNOWN>";
-  }
+/*!
+ * \brief Trys to read the source file content
+ * \returns The source file content
+ * \throws std::runtime_error When opening the file fails
+ */
+string InputBase::readSourceContent(string _file) {
+  FILE *fp = fopen(_file.c_str(), "rb");
+
+  if (!fp)
+    throw std::runtime_error("Unable to read source file " + _file);
+
+  string lContents;
+  fseek(fp, 0, SEEK_END);
+  lContents.resize(static_cast<size_t>(ftell(fp)));
+  rewind(fp);
+  fread(&lContents[0], 1, lContents.size(), fp);
+  fclose(fp);
+  return lContents;
 }

@@ -64,15 +64,13 @@ StageResult DefaultInput::run(Shader *_shader) {
     return StageResult::IO_ERROR;
   }
 
-  vector<tuple<ShaderType, string>> lTests = {{ShaderType::VERTEX, "vertex"},
-                                              {ShaderType::TESS_CON, "tessControl"},
-                                              {ShaderType::TESS_EVA, "tessEval"},
-                                              {ShaderType::GEOMETRY, "geometry"},
-                                              {ShaderType::FRAGMENT, "fragment"},
-                                              {ShaderType::COMPUTE, "compute"}};
-
-  for (auto i : lTests) {
-    auto &         lEntry = lExtSec(get<1>(i));
+  for (auto i : {ShaderType::VERTEX,
+                 ShaderType::TESS_CON,
+                 ShaderType::TESS_EVA,
+                 ShaderType::GEOMETRY,
+                 ShaderType::FRAGMENT,
+                 ShaderType::COMPUTE}) {
+    auto &         lEntry = lExtSec(ShaderModule::shaderType2Str(i));
     vector<string> lExts;
 
     // Extract extensions from the config
@@ -83,9 +81,13 @@ StageResult DefaultInput::run(Shader *_shader) {
       fs::path lToTest = lDir + "/" + lName + "." + j;
       if (fs::exists(lToTest) && fs::is_regular_file(lToTest)) {
         lLogger->info("Found module {}", lToTest.string());
-        ShaderModule &lModule = _shader->getModule(get<0>(i));
-        lModule.setType(get<0>(i));
-        lModule.setSourcePath(lToTest.string());
+        ShaderModule &lModule = _shader->getModule(i);
+
+        try {
+          lModule.setSourceCode(readSourceContent(lToTest.string()));
+        } catch (...) { return StageResult::IO_ERROR; }
+
+        lModule.setType(i);
       }
     }
   }

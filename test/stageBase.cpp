@@ -42,25 +42,25 @@ SCENARIO("Using the StageBase class", "[framework]") {
     StageImpl lCompiler;
     StageImpl lOptimizer;
     StageImpl lDiss;
-    StageImpl lInterpreter;
+    StageImpl lReflector;
     StageImpl lGenerator;
 
-    lInput.vName       = "Input_1";
-    lInput.vType       = StageType::INPUT_FINDER;
-    lCompiler.vName    = "Compiler_2";
-    lCompiler.vType    = StageType::COMPILER;
-    lOptimizer.vName   = "Optimizer_3";
-    lOptimizer.vType   = StageType::OPTIMIZER;
-    lDiss.vName        = "DISS_4";
-    lDiss.vType        = StageType::DISASSEMBLE;
-    lInterpreter.vName = "Interp_5";
-    lInterpreter.vType = StageType::INTERPRETER;
-    lGenerator.vName   = "GENERATOR_6";
-    lGenerator.vType   = StageType::GENERATOR;
+    lInput.vName     = "Input_1";
+    lInput.vType     = StageType::INPUT_FINDER;
+    lCompiler.vName  = "Compiler_2";
+    lCompiler.vType  = StageType::COMPILER;
+    lOptimizer.vName = "Optimizer_3";
+    lOptimizer.vType = StageType::OPTIMIZER;
+    lDiss.vName      = "DISS_4";
+    lDiss.vType      = StageType::DISASSEMBLE;
+    lReflector.vName = "Interp_5";
+    lReflector.vType = StageType::REFLECTOR;
+    lGenerator.vName = "GENERATOR_6";
+    lGenerator.vType = StageType::GENERATOR;
 
     WHEN("initializing them") {
       auto lRoot = std::make_shared<Config>();
-      for (auto i : {&lInput, &lCompiler, &lOptimizer, &lDiss, &lInterpreter, &lGenerator}) {
+      for (auto i : {&lInput, &lCompiler, &lOptimizer, &lDiss, &lReflector, &lGenerator}) {
         i->initialize(lRoot);
       }
 
@@ -69,12 +69,12 @@ SCENARIO("Using the StageBase class", "[framework]") {
         REQUIRE_NOTHROW((*lRoot)["compiler"]["Compiler_2"]);
         REQUIRE_NOTHROW((*lRoot)["optimizer"]["Optimizer_3"]);
         REQUIRE_NOTHROW((*lRoot)["disassemble"]["DISS_4"]);
-        REQUIRE_NOTHROW((*lRoot)["interpreter"]["Interp_5"]);
+        REQUIRE_NOTHROW((*lRoot)["reflector"]["Interp_5"]);
         REQUIRE_NOTHROW((*lRoot)["generator"]["GENERATOR_6"]);
       }
 
       THEN("the configuration can be queried") {
-        for (auto i : {&lInput, &lCompiler, &lOptimizer, &lDiss, &lInterpreter, &lGenerator}) {
+        for (auto i : {&lInput, &lCompiler, &lOptimizer, &lDiss, &lReflector, &lGenerator}) {
           REQUIRE_NOTHROW(i->getRootConfigSection());
           REQUIRE_NOTHROW(i->getStageBaseConfigSection());
         }

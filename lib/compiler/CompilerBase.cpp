@@ -16,7 +16,45 @@
 
 #include "spvCfg.hpp"
 #include "CompilerBase.hpp"
+#include "Enum2Str.hpp"
 
 using namespace spirvPacker;
 
 CompilerBase::~CompilerBase() {}
+
+StageResult CompilerBase::run(Shader *_shader) {
+  auto        lLogger = getLogger();
+  StageResult lRes    = StageResult::SUCCESS;
+
+  if (!_shader) {
+    lLogger->error("The shader may not be null.");
+    return StageResult::ERROR;
+  }
+
+  for (auto i : {ShaderType::VERTEX,
+                 ShaderType::TESS_CON,
+                 ShaderType::TESS_EVA,
+                 ShaderType::GEOMETRY,
+                 ShaderType::FRAGMENT,
+                 ShaderType::COMPUTE}) {
+    ShaderModule &lModule = _shader->getModule(i);
+    if (lModule.isValid()) {
+      std::string lShaderType = lModule.shaderType2Str(lModule.getType());
+      lLogger->info("Compiling [{:^12}] shader module", lShaderType);
+      lRes = compileShaderModule(lModule);
+
+      if (lRes != StageResult::SUCCESS) {
+        lLogger->error("Compiling [{:^12}] shader module failed", lShaderType);
+        lLogger->error("Error code: {}", Enum2Str::toStr(lRes));
+        break;
+      }
+    }
+  }
+
+  if (lRes == StageResult::SUCCESS)
+    lRes = link(_shader);
+
+  cleanup();
+
+  return lRes;
+}

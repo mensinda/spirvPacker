@@ -15,20 +15,21 @@
  */
 
 #include "spvCfg.hpp"
-#include "ShaderModule.hpp"
-#include <cstdio>
+#include "GeneratorBase.hpp"
 
 using namespace spirvPacker;
-using namespace std;
 
-string ShaderModule::shaderType2Str(ShaderType _t) noexcept {
-  switch (_t) {
-    case ShaderType::VERTEX: return "vertex";
-    case ShaderType::TESS_CON: return "tessControl";
-    case ShaderType::TESS_EVA: return "tessEval";
-    case ShaderType::GEOMETRY: return "geometry";
-    case ShaderType::FRAGMENT: return "fragment";
-    case ShaderType::COMPUTE: return "compute";
-    default: return "<UNKNOWN>";
+GeneratorBase::~GeneratorBase() {}
+
+bool GeneratorBase::writeFile(std::string _filePath, const std::string &_data) {
+  FILE *fp = fopen(_filePath.c_str(), "wb");
+
+  if (!fp) {
+    getLogger()->error("Failed to open '{}' for writing", _filePath);
+    return false;
   }
+
+  fwrite(_data.data(), 1, _data.size(), fp);
+  fclose(fp);
+  return true;
 }

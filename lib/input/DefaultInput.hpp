@@ -17,7 +17,7 @@
 #pragma once
 
 #include "spvCfg.hpp"
-#include "StageBase.hpp"
+#include "InputBase.hpp"
 
 namespace spirvPacker {
 
@@ -44,9 +44,8 @@ namespace spirvPacker {
  * | extensions.fragment    | String Array | Extensions for the fragment shader stage               |
  * | extensions.compute     | String Array | Extensions for the compute shader stage                |
  */
-class DefaultInput final : public StageBase {
+class DefaultInput final : public InputBase {
  public:
-  inline StageType   getStageType() const noexcept override { return StageType::INPUT_FINDER; }
   inline std::string getName() const noexcept override { return "defaultInput"; }
 
   bool        initializeStage() override;

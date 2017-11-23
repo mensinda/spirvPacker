@@ -1,6 +1,7 @@
 /doxygen/
 /build*
 *.kdev4
+Enum2Str.*
 
 CMakeLists.txt
 !/CMakeLists.txt

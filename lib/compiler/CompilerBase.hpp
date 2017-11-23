@@ -22,12 +22,16 @@
 namespace spirvPacker {
 
 class CompilerBase : public StageBase {
- private:
  public:
   CompilerBase() = default;
   ~CompilerBase() override;
 
-  StageType getStageType() const noexcept override { return StageType::COMPILER; }
+  virtual StageResult compileShaderModule(ShaderModule &m) = 0;
+  virtual StageResult link(Shader *_shader)                = 0;
+  virtual void        cleanup()                            = 0;
+
+  StageType   getStageType() const noexcept override { return StageType::COMPILER; }
+  StageResult run(Shader *_shader) override;
 };
 
 } // namespace spirvPacker

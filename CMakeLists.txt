@@ -60,16 +60,21 @@ add_compiler( Clang MIN_VERSION "5.0"
               RELEASE  "-O2" )
 
 find_package( Threads REQUIRED )
+find_package( GLSLANG REQUIRED )
 
 ##################
 # Config Project #
 ##################
 
+# Generate dummy files
+file( WRITE "${PROJECT_SOURCE_DIR}/lib/utils/Enum2Str.hpp" "" )
+file( WRITE "${PROJECT_SOURCE_DIR}/lib/utils/Enum2Str.cpp" "" )
+
 new_project_library(
   PATH         "${PROJECT_SOURCE_DIR}/lib"
   NAME         "${PROJECT_NAME}"
   TEMPLATE     "${TEMPLATES_DIR}/CMakeLists.lib.in"
-  DEPENDENCIES stdc++fs Threads::Threads
+  DEPENDENCIES stdc++fs Threads::Threads ${GLSLANG_LIBRARIES}
 )
 
 new_project_executable(
@@ -94,8 +99,10 @@ include_directories(
 )
 
 include_directories( SYSTEM
+  ${GLSLANG_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/external/catch
   ${PROJECT_SOURCE_DIR}/external/spdlog/include
+  ${PROJECT_SOURCE_DIR}/external/spirv
 )
 
 # Add all libs and tests directories
@@ -106,6 +113,40 @@ endforeach()
 ##################
 # Generate Files #
 ##################
+
+set(
+  SPIRV_ENUMS
+    "SourceLanguage" "ExecutionModel" "AddressingModel" "MemoryModel" "ExecutionMode" "StorageClass" "Dim"
+    "SamplerAddressingMode" "SamplerFilterMode" "ImageFormat" "ImageChannelOrder" "ImageChannelDataType"
+    "ImageOperandsShift" "ImageOperandsMask" "FPFastMathModeShift" "FPFastMathModeMask" "FPRoundingMode" "LinkageType"
+    "AccessQualifier" "FunctionParameterAttribute" "Decoration" "BuiltIn" "SelectionControlShift"
+    "SelectionControlMask" "LoopControlShift" "LoopControlMask" "FunctionControlShift" "FunctionControlMask"
+    "MemorySemanticsShift" "MemorySemanticsMask" "MemoryAccessShift" "MemoryAccessMask" "Scope" "GroupOperation"
+    "KernelEnqueueFlags" "KernelProfilingInfoShift" "KernelProfilingInfoMask" "Capability" "Op"
+)
+
+set( SPIRV_ENUMS_NAMESPACE )
+
+foreach( I IN LISTS SPIRV_ENUMS )
+  set( SPIRV_ENUMS_NAMESPACE ${SPIRV_ENUMS_NAMESPACE} "spv::${I}" )
+endforeach()
+
+enum2str_generate(
+  PATH "${PROJECT_SOURCE_DIR}/lib/utils"
+  CLASS_NAME      "Enum2Str"
+  NAMESPACE       "spirvPacker"
+  FUNC_NAME       "toStr"
+  INDENT_STR      "  "
+  BITFIELD_TYPE   uint32_t
+  CONCATINATE_STR " | "
+#   ENABLE_BITFIELDS
+  INCLUDES
+    "spirv.hpp"
+    "StageBase.hpp" "ShaderModule.hpp"
+  ENUMS
+    "StageType" "StageResult" "ShaderType" "SourceFormat"
+    ${SPIRV_ENUMS_NAMESPACE}
+)
 
 install( EXPORT ${PROJECT_NAME}Targets DESTINATION lib/cmake/${PROJECT_NAME} )
 

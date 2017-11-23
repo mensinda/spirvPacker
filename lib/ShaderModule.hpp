@@ -25,34 +25,47 @@ namespace spirvPacker {
  * \brief Defines enumerations for all supported shader stages
  */
 enum class ShaderType {
-  VERTEX = 0, //!< The Vertex shader stage
-  TESS_CON,   //!< The tesselation control shader stage
-  TESS_EVA,   //!< The tesselation evaluation shader stage
-  GEOMETRY,   //!< The geometry shader stage
-  FRAGMENT,   //!< The fragment shader stage
-  COMPUTE,    //!< The compute shader stage
-  __NUM__,    //!< Last shader stage (= number of shader stages) or undefined
+  VERTEX = 0,    //!< The Vertex shader stage
+  TESS_CON,      //!< The tesselation control shader stage
+  TESS_EVA,      //!< The tesselation evaluation shader stage
+  GEOMETRY,      //!< The geometry shader stage
+  FRAGMENT,      //!< The fragment shader stage
+  COMPUTE,       //!< The compute shader stage
+  __UNDEFINED__, //!< The shader stage is indefined and / or not set
+};
+
+//! \brief The format of the source files
+enum class SourceFormat {
+  GLSL, //!< \brief The source format of the input is GLSL
+  HLSL  //!< \brief The source format of the input is HLSL
 };
 
 /*!
  * \brief Stores all information of a shader module
  *
- * A shader module object is valid when its type is not ShaderType::__NUM__
+ * A shader module object is valid when its type is not ShaderType::__UNDEFINED__
  */
-class ShaderModule final {
+struct ShaderModule final {
  private:
-  ShaderType  vType = ShaderType::__NUM__;
-  std::string vSourceFilePath;
+  ShaderType            vType   = ShaderType::__UNDEFINED__;
+  SourceFormat          vFormat = SourceFormat::GLSL;
+  std::string           vSourceCode;
+  std::vector<uint32_t> vSPIRVBinary;
 
  public:
   ShaderModule() = default;
 
   inline void setType(ShaderType _t) noexcept { vType = _t; }
-  inline void setSourcePath(std::string _path) noexcept { vSourceFilePath = _path; }
+  inline void setSourceFormat(SourceFormat _f) noexcept { vFormat = _f; }
+  inline void setSourceCode(std::string _src) noexcept { vSourceCode = _src; }
 
-  inline ShaderType  getType() const noexcept { return vType; } //!< Returns the type of the shader (see ShaderType)
-  inline std::string getSourcePath() const noexcept { return vSourceFilePath; }
-  inline bool        isValid() const noexcept { return vType != ShaderType::__NUM__; }
+  inline ShaderType             getType() const noexcept { return vType; }
+  inline SourceFormat           getSourceFormat() const noexcept { return vFormat; }
+  inline std::string            getSourceCode() const noexcept { return vSourceCode; }
+  inline std::vector<uint32_t> &getSPIRVBinaryRef() noexcept { return vSPIRVBinary; }
+  inline bool                   isValid() const noexcept { return vType != ShaderType::__UNDEFINED__; }
+
+  static std::string shaderType2Str(ShaderType _t) noexcept;
 };
 
 } // namespace spirvPacker

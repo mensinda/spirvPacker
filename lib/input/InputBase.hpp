@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include "spvCfg.hpp"
-#include "ShaderModule.hpp"
-#include <cstdio>
+#include "StageBase.hpp"
 
-using namespace spirvPacker;
-using namespace std;
+namespace spirvPacker {
 
-string ShaderModule::shaderType2Str(ShaderType _t) noexcept {
-  switch (_t) {
-    case ShaderType::VERTEX: return "vertex";
-    case ShaderType::TESS_CON: return "tessControl";
-    case ShaderType::TESS_EVA: return "tessEval";
-    case ShaderType::GEOMETRY: return "geometry";
-    case ShaderType::FRAGMENT: return "fragment";
-    case ShaderType::COMPUTE: return "compute";
-    default: return "<UNKNOWN>";
-  }
-}
+class InputBase : public StageBase {
+ public:
+  inline StageType getStageType() const noexcept override { return StageType::INPUT_FINDER; }
+
+  static std::string readSourceContent(std::string _file);
+};
+
+} // namespace spirvPacker

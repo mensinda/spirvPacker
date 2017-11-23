@@ -75,7 +75,7 @@ std::string StageBase::stageTypeToString(StageType _type) {
     case StageType::COMPILER: return "compiler";
     case StageType::OPTIMIZER: return "optimizer";
     case StageType::DISASSEMBLE: return "disassemble";
-    case StageType::INTERPRETER: return "interpreter";
+    case StageType::REFLECTOR: return "reflector";
     case StageType::GENERATOR: return "generator";
   }
   return "<UNKNOWN>"; // should be unreachable but gcc complains

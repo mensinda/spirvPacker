@@ -37,12 +37,6 @@ bool SpirvPacker::initializeStages(std::shared_ptr<Config> _rootCfg) {
     return false;
   }
 
-  auto &lCfgLog = vRootCfg->addSection("logging");
-  lCfgLog.addEntry("spdlogLevel", 2l, [](ConfigEntry const *e) { return e->valInt() >= 0 && e->valInt() <= 5; });
-  lCfgLog.addEntry("enable", true);
-  lCfgLog.addEntry("writeToFile", false);
-  lCfgLog.addEntry("logFile", ""_str);
-
   auto &lBase = vRootCfg->addSection("base");
   lBase.addEntry("name", ""_str, [](ConfigEntry const *e) { return !e->valStr().empty(); });
 
@@ -52,7 +46,7 @@ bool SpirvPacker::initializeStages(std::shared_ptr<Config> _rootCfg) {
                       StageType::COMPILER,
                       StageType::OPTIMIZER,
                       StageType::DISASSEMBLE,
-                      StageType::INTERPRETER,
+                      StageType::REFLECTOR,
                       StageType::GENERATOR}) {
     lStages.addEntry(StageBase::stageTypeToString(i), ""_str);
   }
@@ -116,7 +110,7 @@ SpirvExecuteResult SpirvPacker::run(Shader *_s) {
                       StageType::COMPILER,
                       StageType::OPTIMIZER,
                       StageType::DISASSEMBLE,
-                      StageType::INTERPRETER,
+                      StageType::REFLECTOR,
                       StageType::GENERATOR}) {
     string lStageStr = StageBase::stageTypeToString(i);
     string lStageID  = (*vRootCfg)["stages"](lStageStr).valStr();

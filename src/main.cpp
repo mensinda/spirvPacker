@@ -17,6 +17,8 @@
 #include "Config.hpp"
 #include "ConfigPrinter.hpp"
 #include "DefaultInput.hpp"
+#include "GLSLangCompiler.hpp"
+#include "SPIRVDumper.hpp"
 #include "SpirvPacker.hpp"
 #include <iostream>
 
@@ -33,11 +35,16 @@ int main(int argc, char *argv[]) {
   (void)argv;
 
   lPacker.addStage(make_shared<DefaultInput>());
+  lPacker.addStage(make_shared<GLSLangCompiler>());
+  lPacker.addStage(make_shared<SPIRVDumper>());
   lPacker.initializeStages(lCfg);
 
-  (*lCfg)["base"]("name")                       = "triangle1"_str;
-  (*lCfg)["stages"]("input")                    = "defaultInput"_str;
-  (*lCfg)["input"]["defaultInput"]("directory") = SOURCE_DIR + "/test/data"_str;
+  (*lCfg)["base"]("name")                          = "triangle1"_str;
+  (*lCfg)["stages"]("input")                       = "defaultInput"_str;
+  (*lCfg)["stages"]("compiler")                    = "glslang"_str;
+  (*lCfg)["stages"]("generator")                   = "SPIRVDumper"_str;
+  (*lCfg)["input"]["defaultInput"]("directory")    = SOURCE_DIR + "/test/data"_str;
+  (*lCfg)["generator"]["SPIRVDumper"]("directory") = SOURCE_DIR + "/build"_str;
 
   bool lValRes = lCfg->validate();
   cout << "Validation: " << (lValRes ? "true" : "false") << endl << endl;

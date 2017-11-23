@@ -27,7 +27,7 @@ namespace spirvPacker {
  */
 class Shader final {
  private:
-  std::array<ShaderModule, static_cast<size_t>(ShaderType::__NUM__)> vModules;
+  std::array<ShaderModule, static_cast<size_t>(ShaderType::__UNDEFINED__)> vModules;
 
  public:
   Shader() = default;

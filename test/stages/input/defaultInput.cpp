@@ -22,7 +22,7 @@ using namespace Catch;
 using namespace Catch::Matchers;
 using namespace std;
 
-SCENARIO("testing the DefaultInput") {
+SCENARIO("testing the DefaultInput", "[input]") {
   GIVEN("a config and the default input and a shader object") {
     DefaultInput lInput;
     Shader       lShader;
@@ -36,12 +36,15 @@ SCENARIO("testing the DefaultInput") {
       REQUIRE(lCfg->validate() == true);
 
       THEN("the 2 shader files are found") {
+        string lVertexSRC   = InputBase::readSourceContent(SOURCE_DIR + "/test/data/triangle1.vert"_str);
+        string lFragmentSRC = InputBase::readSourceContent(SOURCE_DIR + "/test/data/triangle1.frag"_str);
+
         REQUIRE(lInput.run(&lShader) == StageResult::SUCCESS);
         REQUIRE(lShader[ShaderType::VERTEX].isValid() == true);
         REQUIRE(lShader[ShaderType::VERTEX].getType() == ShaderType::VERTEX);
-        REQUIRE(lShader[ShaderType::VERTEX].getSourcePath() == SOURCE_DIR + "/test/data/triangle1.vert"_str);
-        REQUIRE(lShader[ShaderType::FRAGMENT].getSourcePath() == SOURCE_DIR + "/test/data/triangle1.frag"_str);
-        REQUIRE(lShader[ShaderType::GEOMETRY].getSourcePath() == "");
+        REQUIRE(lShader[ShaderType::VERTEX].getSourceCode() == lVertexSRC);
+        REQUIRE(lShader[ShaderType::FRAGMENT].getSourceCode() == lFragmentSRC);
+        REQUIRE(lShader[ShaderType::GEOMETRY].getSourceCode() == "");
       }
     }
 
