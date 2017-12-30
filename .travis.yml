@@ -19,11 +19,11 @@ matrix:
   include:
     - os: linux
       compiler: gcc
-      env: CXX='g++-7' CC="gcc-7" COVERAGE=ON
+      env: C_CXX='g++-7' C_CC="gcc-7" COVERAGE=ON
 
     - os: linux
       compiler: clang
-      env: CXX='clang++-5.0' CC="clang-5.0" COVERAGE=OFF
+      env: C_CXX='clang++-5.0' C_CC="clang-5.0" COVERAGE=OFF
 
 before_install:
   - CM_V_MAJOR=3
@@ -32,6 +32,8 @@ before_install:
   - CMAKE_BASE_NAME="cmake-${CM_V_MAJOR}.${CM_V_MINOR}.${CM_V_PATCH}-Linux-x86_64"
   - LCOV_EXCLUDE="'/usr/*' '*/external/*' '*/Enum2Str*' '*/test/*' '$HOME/install/*' '*BinaryOpParser*' '*SPIRVOperands*' '*ToolMagicNumber*'"
   - CMAKE_DOWNLOAD_LINK="https://cmake.org/files/v${CM_V_MAJOR}.${CM_V_MINOR}/${CMAKE_BASE_NAME}.tar.gz"
+  - export CXX=$C_CXX
+  - export CC=$CC
   - cd "$HOME"
   - mkdir "install"
 
