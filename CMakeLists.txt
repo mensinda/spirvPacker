@@ -139,12 +139,14 @@ enum2str_generate(
   INDENT_STR      "  "
   BITFIELD_TYPE   uint32_t
   CONCATINATE_STR " | "
-#   ENABLE_BITFIELDS
+  ENABLE_BITFIELDS
   INCLUDES
     "spirv.hpp"
     "StageBase.hpp" "ShaderModule.hpp"
+    "SPIRVOperands.hpp"
   ENUMS
     "StageType" "StageResult" "ShaderType" "SourceFormat"
+    "dis::Category" "dis::Kind"
     ${SPIRV_ENUMS_NAMESPACE}
 )
 

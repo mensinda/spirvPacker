@@ -52,7 +52,7 @@ SCENARIO("Using the StageBase class", "[framework]") {
     lOptimizer.vName = "Optimizer_3";
     lOptimizer.vType = StageType::OPTIMIZER;
     lDiss.vName      = "DISS_4";
-    lDiss.vType      = StageType::DISASSEMBLE;
+    lDiss.vType      = StageType::DISASSEMBLER;
     lReflector.vName = "Interp_5";
     lReflector.vType = StageType::REFLECTOR;
     lGenerator.vName = "GENERATOR_6";
@@ -68,7 +68,7 @@ SCENARIO("Using the StageBase class", "[framework]") {
         REQUIRE_NOTHROW((*lRoot)["input"]["Input_1"]);
         REQUIRE_NOTHROW((*lRoot)["compiler"]["Compiler_2"]);
         REQUIRE_NOTHROW((*lRoot)["optimizer"]["Optimizer_3"]);
-        REQUIRE_NOTHROW((*lRoot)["disassemble"]["DISS_4"]);
+        REQUIRE_NOTHROW((*lRoot)["disassembler"]["DISS_4"]);
         REQUIRE_NOTHROW((*lRoot)["reflector"]["Interp_5"]);
         REQUIRE_NOTHROW((*lRoot)["generator"]["GENERATOR_6"]);
       }

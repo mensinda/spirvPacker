@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 EEnginE project
+ * Copyright (C) 2017 Daniel Mensinger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-#version 450
+#pragma once
 
-layout (location = 0) in vec3 iVertex;
-layout (location = 1) in vec3 iNormals;
-layout (location = 2) in vec2 iUV;
+#include "spvCfg.hpp"
+#include "StageBase.hpp"
 
-layout (set = 0, binding = 0) uniform UBuffer {
-  mat4 mvp;
-  float lodBias;
-  mat3 normal;
-} uBuff;
+namespace spirvPacker {
 
-layout (location = 0) out vec3  vNormals;
-layout (location = 1) out vec2  vUV;
-layout (location = 2) out float vLodBias;
+class DisassemblerBase : public StageBase {
+ public:
+  DisassemblerBase() = default;
+  ~DisassemblerBase() override;
 
-void main() {
-   vLodBias = uBuff.lodBias + sqrt(uBuff.lodBias);
-   vNormals = uBuff.normal * iNormals;
-   vUV = iUV;
-   gl_Position = uBuff.mvp * vec4(iVertex, 1.0);
-}
+  virtual StageResult disassembleModule(ShaderModule &_mod) = 0;
+
+  StageType   getStageType() const noexcept override { return StageType::DISASSEMBLER; }
+  StageResult run(spirvPacker::Shader *_shader) override;
+};
+
+} // namespace spirvPacker

@@ -74,7 +74,7 @@ std::string StageBase::stageTypeToString(StageType _type) {
     case StageType::INPUT_FINDER: return "input";
     case StageType::COMPILER: return "compiler";
     case StageType::OPTIMIZER: return "optimizer";
-    case StageType::DISASSEMBLE: return "disassemble";
+    case StageType::DISASSEMBLER: return "disassembler";
     case StageType::REFLECTOR: return "reflector";
     case StageType::GENERATOR: return "generator";
   }

@@ -27,18 +27,20 @@ enum class StageType {
   INPUT_FINDER, //!< \brief Assembles the input files of the shader
   COMPILER,     //!< \brief Compiles the source code into SPIR-V
   OPTIMIZER,    //!< \brief Optimizes the compiled SPIR-V binary
-  DISASSEMBLE,  //!< \brief Disassembles the compiled SPIR-V binary into data structures
+  DISASSEMBLER, //!< \brief Disassembles the compiled SPIR-V binary into data structures
   REFLECTOR,    //!< \brief Reflects on the disassembled code and generates more useful data for the generators
   GENERATOR     //!< \brief Generates the output
 };
 
 enum class StageResult {
-  SUCCESS,        //!< \brief Everything went fine
-  ERROR,          //!< \brief Some generic error occurred.
-  DATA_MISSING,   //!< \brief A previous stage was skipped or has not written any / enough data.
-  IO_ERROR,       //!< \brief Reading / writing data failed
-  COMPILER_ERROR, //!< \brief compiling the shader stages failed
-  LINKER_ERROR,   //!< \brief Linking the shader stages failed
+  SUCCESS,            //!< \brief Everything went fine
+  ERROR,              //!< \brief Some generic error occurred.
+  DATA_MISSING,       //!< \brief A previous stage was skipped or has not written any / enough data.
+  IO_ERROR,           //!< \brief Reading / writing data failed
+  COMPILER_ERROR,     //!< \brief compiling the shader stages failed
+  LINKER_ERROR,       //!< \brief Linking the shader stages failed
+  DISASSEMBLER_ERROR, //!< \brief Disassembling SPIR-V binary data failed
+  INVALID_SPIRV,      //!< \brief The SPIR-V binary data is not valid
 };
 
 /*!

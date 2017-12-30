@@ -45,7 +45,7 @@ bool SpirvPacker::initializeStages(std::shared_ptr<Config> _rootCfg) {
   for (StageType i : {StageType::INPUT_FINDER,
                       StageType::COMPILER,
                       StageType::OPTIMIZER,
-                      StageType::DISASSEMBLE,
+                      StageType::DISASSEMBLER,
                       StageType::REFLECTOR,
                       StageType::GENERATOR}) {
     lStages.addEntry(StageBase::stageTypeToString(i), ""_str);
@@ -109,7 +109,7 @@ SpirvExecuteResult SpirvPacker::run(Shader *_s) {
   for (StageType i : {StageType::INPUT_FINDER,
                       StageType::COMPILER,
                       StageType::OPTIMIZER,
-                      StageType::DISASSEMBLE,
+                      StageType::DISASSEMBLER,
                       StageType::REFLECTOR,
                       StageType::GENERATOR}) {
     string lStageStr = StageBase::stageTypeToString(i);

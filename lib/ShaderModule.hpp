@@ -17,6 +17,7 @@
 #pragma once
 
 #include "spvCfg.hpp"
+#include "SPIRVDisassembly.hpp"
 #include <string>
 
 namespace spirvPacker {
@@ -51,6 +52,7 @@ struct ShaderModule final {
   SourceFormat          vFormat = SourceFormat::GLSL;
   std::string           vSourceCode;
   std::vector<uint32_t> vSPIRVBinary;
+  dis::DisassemblyData  vDisassemblyData;
 
  public:
   ShaderModule() = default;
@@ -63,6 +65,7 @@ struct ShaderModule final {
   inline SourceFormat           getSourceFormat() const noexcept { return vFormat; }
   inline std::string            getSourceCode() const noexcept { return vSourceCode; }
   inline std::vector<uint32_t> &getSPIRVBinaryRef() noexcept { return vSPIRVBinary; }
+  inline dis::DisassemblyData & getDisassemblyDataRef() noexcept { return vDisassemblyData; }
   inline bool                   isValid() const noexcept { return vType != ShaderType::__UNDEFINED__; }
 
   static std::string shaderType2Str(ShaderType _t) noexcept;
