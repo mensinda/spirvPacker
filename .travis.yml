@@ -19,11 +19,11 @@ matrix:
   include:
     - os: linux
       compiler: gcc
-      env: COMPILER='g++-7' COVERAGE=ON
+      env: CXX='g++-7' CC="gcc-7" COVERAGE=ON
 
     - os: linux
       compiler: clang
-      env: COMPILER='clang++-5.0' COVERAGE=OFF
+      env: CXX='clang++-5.0' CC="clang-5.0" COVERAGE=OFF
 
 before_install:
   - CM_V_MAJOR=3
@@ -56,7 +56,7 @@ install:
   # install glslang
   - cd "$HOME/glslang/build"
   - git pull
-  - ${CMAKE_EXE} -DCMAKE_CXX_COMPILER="g++" -DCMAKE_CXX_COMPILER="gcc" -DCMAKE_INSTALL_PREFIX="$HOME/install" ..
+  - ${CMAKE_EXE} -DCMAKE_CXX_COMPILER="g++" -DCMAKE_C_COMPILER="gcc" -DCMAKE_INSTALL_PREFIX="$HOME/install" ..
   - make install
 
   - if [[ "$COVERAGE" == "ON" ]]; then gem install coveralls-lcov; fi
@@ -66,7 +66,7 @@ script:
   - CLANG_FORMAT_CMD=clang-format-5.0 ./checkFormat.sh --only-check
   - mkdir build
   - cd build
-  - ${CMAKE_EXE} -DCMAKE_INSTALL_PREFIX="$HOME/install" -DCMAKE_CXX_COMPILER="${COMPILER}" -DENABLE_CODE_COVERAGE=$COVERAGE ..
+  - ${CMAKE_EXE} -DCMAKE_INSTALL_PREFIX="$HOME/install" -DENABLE_CODE_COVERAGE=$COVERAGE ..
   - make
   - ./bin/tests
 
