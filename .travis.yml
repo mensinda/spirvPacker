@@ -30,7 +30,6 @@ before_install:
   - CM_V_MINOR=10
   - CM_V_PATCH=1
   - CMAKE_BASE_NAME="cmake-${CM_V_MAJOR}.${CM_V_MINOR}.${CM_V_PATCH}-Linux-x86_64"
-  - LCOV_EXCLUDE="/usr/* */external/* */Enum2Str* */test/* $HOME/install/* *BinaryOpParser* *SPIRVOperands* *ToolMagicNumber*"
   - CMAKE_DOWNLOAD_LINK="https://cmake.org/files/v${CM_V_MAJOR}.${CM_V_MINOR}/${CMAKE_BASE_NAME}.tar.gz"
   - export CXX=$C_CXX
   - export CC=$CC
@@ -74,6 +73,6 @@ script:
 
 after_success:
   - if [[ "$COVERAGE" == "ON" ]]; then lcov --directory . --capture --output-file coverage.info;                      fi
-  - if [[ "$COVERAGE" == "ON" ]]; then lcov --remove coverage.info $LCOV_EXCLUDE --output-file coverage.info;         fi
+  - if [[ "$COVERAGE" == "ON" ]]; then lcov --remove coverage.info "/usr/*" "*/external/*" "*/Enum2Str*" "*/test/*" "$HOME/install/*" "*BinaryOpParser*" "*SPIRVOperands*" "*ToolMagicNumber*" --output-file coverage.info; fi
   - if [[ "$COVERAGE" == "ON" ]]; then lcov --list coverage.info;                                                     fi
   - if [[ "$COVERAGE" == "ON" ]]; then coveralls-lcov --source-encoding=ISO-8859-1 coverage.info;                     fi
