@@ -53,8 +53,9 @@ SCENARIO("Exporting a config to JSON", "[cfg]") {
 
       AND_WHEN("the printer is reset") {
         lExporter.reset();
+        std::string lRes = lExporter.getResult();
 
-        THEN("the generated JSON string is empty") { REQUIRE(lExporter.getResult() == "{}"); }
+        THEN("the generated JSON string is empty") { REQUIRE((lRes == "{}" || lRes == "null")); }
       }
     }
 
