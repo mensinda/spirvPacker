@@ -15,6 +15,8 @@
  */
 
 #include "Config.hpp"
+#include "ConfigExport.hpp"
+#include "ConfigImport.hpp"
 #include "ConfigPrinter.hpp"
 #include "DefaultInput.hpp"
 #include "Disassembler.hpp"
@@ -30,6 +32,8 @@ int main(int argc, char *argv[]) {
   SpirvPacker   lPacker;
   auto          lCfg = make_shared<Config>();
   ConfigPrinter lPrinter;
+  ConfigExport  lExporter;
+  ConfigImport  lImporter;
   Shader        lShader;
 
   (void)argc;
@@ -52,8 +56,8 @@ int main(int argc, char *argv[]) {
   bool lValRes = lCfg->validate();
   cout << "Validation: " << (lValRes ? "true" : "false") << endl << endl;
 
-  lCfg->accept(&lPrinter);
-  cout << lPrinter.getResult() << endl;
+  lCfg->accept(&lExporter);
+  cout << lExporter.getResult() << endl;
 
   return lPacker.run(&lShader) == SpirvExecuteResult::SUCCESS ? 0 : 1;
 }

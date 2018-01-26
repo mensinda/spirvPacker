@@ -40,6 +40,7 @@ SCENARIO("disassembling data", "[disassembler]") {
     fclose(fp);
 
     REQUIRE(lContents.empty() == false);
+    REQUIRE(lDis.initialize(make_shared<Config>()) == true);
 
     lMod.setType(ShaderType::VERTEX);
 

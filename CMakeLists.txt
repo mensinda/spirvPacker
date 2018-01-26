@@ -100,6 +100,7 @@ include_directories(
 
 include_directories( SYSTEM
   ${GLSLANG_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/external/json/src
   ${PROJECT_SOURCE_DIR}/external/catch
   ${PROJECT_SOURCE_DIR}/external/spdlog/include
   ${PROJECT_SOURCE_DIR}/external/spirv
