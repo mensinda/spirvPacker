@@ -64,12 +64,7 @@ StageResult DefaultInput::run(Shader *_shader) {
     return StageResult::IO_ERROR;
   }
 
-  for (auto i : {ShaderType::VERTEX,
-                 ShaderType::TESS_CON,
-                 ShaderType::TESS_EVA,
-                 ShaderType::GEOMETRY,
-                 ShaderType::FRAGMENT,
-                 ShaderType::COMPUTE}) {
+  for (auto i : ShaderModule::getAllShaderTypes()) {
     auto &         lEntry = lExtSec(ShaderModule::shaderType2Str(i));
     vector<string> lExts;
 

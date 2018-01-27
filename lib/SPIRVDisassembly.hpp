@@ -26,10 +26,10 @@ namespace spirvPacker {
 namespace dis {
 
 struct GeneratorInfo {
-  uint32_t    value;
-  std::string vendor;
-  std::string comment;
-  std::string tool;
+  uint32_t    value   = 0;
+  std::string vendor  = "<UNDEFINED>";
+  std::string comment = "<UNDEFINED>";
+  std::string tool    = "<UNDEFINED>";
 };
 
 struct Instruction {
@@ -40,10 +40,10 @@ struct Instruction {
 };
 
 struct DisassemblyData {
-  uint32_t      magicNumber;
-  uint32_t      version;
+  uint32_t      magicNumber = 0;
+  uint32_t      version     = 0;
   GeneratorInfo generator;
-  uint32_t      bound;
+  uint32_t      bound = 0;
 
   std::vector<uint32_t> headRaw;
 

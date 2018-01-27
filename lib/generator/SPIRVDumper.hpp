@@ -33,12 +33,14 @@ namespace spirvPacker {
  * | directory | String | The directory where to put the generated files                                    |
  */
 class SPIRVDumper final : public GeneratorBase {
+ protected:
+  bool initializeStage() override;
+
  public:
   SPIRVDumper() = default;
   ~SPIRVDumper() override;
 
   inline std::string getName() const noexcept override { return "SPIRVDumper"; }
-  bool               initializeStage() override;
   StageResult        run(Shader *_shader) override;
 };
 

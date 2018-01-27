@@ -22,6 +22,9 @@
 namespace spirvPacker {
 
 class Disassembler final : public DisassemblerBase {
+ protected:
+  bool initializeStage() override;
+
  public:
   Disassembler() = default;
   ~Disassembler() override;
@@ -29,7 +32,6 @@ class Disassembler final : public DisassemblerBase {
   StageResult disassembleModule(ShaderModule &_mod) override;
 
   std::string getName() const noexcept override { return "Disassembler"; }
-  bool        initializeStage() override;
 };
 
 } // namespace spirvPacker

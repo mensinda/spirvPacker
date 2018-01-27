@@ -79,6 +79,12 @@ SCENARIO("Setting and reading config entries", "[cfg]") {
       REQUIRE(lRoot.validate() == false);
     }
 
+    THEN("an invalid type should fail") {
+      REQUIRE_NOTHROW(lRoot["testSec"]["content"]("int") = std::string("asdfg"));
+      REQUIRE_NOTHROW(lRoot["testSec"]["content"]("str") = 42l);
+      REQUIRE(lRoot.validate() == false);
+    }
+
     WHEN("modifying an array") {
       lRoot["testSec"]("array") += "asd"_str;
       lRoot["testSec"]("array") += "fff"_str;

@@ -31,12 +31,7 @@ StageResult DisassemblerBase::run(Shader *_shader) {
     return StageResult::ERROR;
   }
 
-  for (auto i : {ShaderType::VERTEX,
-                 ShaderType::TESS_CON,
-                 ShaderType::TESS_EVA,
-                 ShaderType::GEOMETRY,
-                 ShaderType::FRAGMENT,
-                 ShaderType::COMPUTE}) {
+  for (auto i : ShaderModule::getAllShaderTypes()) {
     auto &lModule = _shader->getModule(i);
     if (!lModule.isValid())
       continue;

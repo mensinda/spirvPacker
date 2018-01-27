@@ -31,12 +31,7 @@ StageResult CompilerBase::run(Shader *_shader) {
     return StageResult::ERROR;
   }
 
-  for (auto i : {ShaderType::VERTEX,
-                 ShaderType::TESS_CON,
-                 ShaderType::TESS_EVA,
-                 ShaderType::GEOMETRY,
-                 ShaderType::FRAGMENT,
-                 ShaderType::COMPUTE}) {
+  for (auto i : ShaderModule::getAllShaderTypes()) {
     ShaderModule &lModule = _shader->getModule(i);
     if (lModule.isValid()) {
       std::string lShaderType = lModule.shaderType2Str(lModule.getType());

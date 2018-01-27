@@ -74,16 +74,13 @@ inline std::string getMehStr() {
       "arrayBoolll": [
         true
       ],
-      "arrayDouble": "a String",
+      "arrayDouble": [1.0, 2.4],
       "arrayInt": [
         false,
         42.4,
         "HA HA HA"
       ],
-      "arrayStr": [
-        "Test -- new",
-        "qwert"
-      ]
+      "arrayStr": "HAHA"
     }
   }
 })";
@@ -137,9 +134,9 @@ SCENARIO("Importing a config to JSON", "[cfg]") {
         REQUIRE(lRoot("boolTest").valBool() == true);
 
         REQUIRE(lRoot["testSec"]("arrayBool").size() == 2);
-        REQUIRE(lRoot["testSec"]("arrayDouble").size() == 1); // No arry --> Nothing changes
-        REQUIRE(lRoot["testSec"]("arrayInt").size() == 1);    // Only one valid integer in the new JSON
-        REQUIRE(lRoot["testSec"]("arrayStr").size() == 2);
+        REQUIRE(lRoot["testSec"]("arrayDouble").size() == 2);
+        REQUIRE(lRoot["testSec"]("arrayInt").size() == 1); // Only one valid integer in the new JSON
+        REQUIRE(lRoot["testSec"]("arrayStr").size() == 2); // No arry --> Nothing changes
 
         REQUIRE(lRoot["testSec"]["content"]("str").valStr() == "TMP");
       }

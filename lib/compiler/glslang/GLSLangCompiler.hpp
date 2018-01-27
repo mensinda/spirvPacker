@@ -37,6 +37,9 @@ class GLSLangCompiler final : public CompilerBase {
   void             initResources(ConfigSection &_sec);
   TBuiltInResource getResources(ConfigSection &_sec);
 
+ protected:
+  bool initializeStage() override;
+
  public:
   GLSLangCompiler();
   ~GLSLangCompiler() override;
@@ -46,7 +49,6 @@ class GLSLangCompiler final : public CompilerBase {
   void        cleanup() override;
 
   inline std::string getName() const noexcept override { return "glslang"; }
-  bool               initializeStage() override;
 };
 
 } // namespace spirvPacker

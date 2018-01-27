@@ -32,3 +32,12 @@ string ShaderModule::shaderType2Str(ShaderType _t) noexcept {
     default: return "<UNKNOWN>";
   }
 }
+
+vector<ShaderType> ShaderModule::getAllShaderTypes() noexcept {
+  return {ShaderType::VERTEX,
+          ShaderType::TESS_CON,
+          ShaderType::TESS_EVA,
+          ShaderType::GEOMETRY,
+          ShaderType::FRAGMENT,
+          ShaderType::COMPUTE};
+}

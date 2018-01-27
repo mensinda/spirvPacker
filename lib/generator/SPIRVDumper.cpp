@@ -54,12 +54,7 @@ StageResult SPIRVDumper::run(Shader *_shader) {
     return StageResult::IO_ERROR;
   }
 
-  for (auto i : {ShaderType::VERTEX,
-                 ShaderType::TESS_CON,
-                 ShaderType::TESS_EVA,
-                 ShaderType::GEOMETRY,
-                 ShaderType::FRAGMENT,
-                 ShaderType::COMPUTE}) {
+  for (auto i : ShaderModule::getAllShaderTypes()) {
     auto &                 lStage = _shader->getModule(i);
     std::vector<uint32_t> &lData  = lStage.getSPIRVBinaryRef();
 

@@ -81,7 +81,6 @@ bool ConfigImport::visit(ConfigEntry *_entry) {
         break;
 
       _entry->clear();
-      auto lLogger = getLogger();
       for (auto i : lEntry) {
         switch (GET(ARRAY_TYPE, lValue).index) {
           case ConfigEntry::STR_TYPE:

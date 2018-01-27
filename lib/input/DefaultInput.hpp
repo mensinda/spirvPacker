@@ -45,10 +45,12 @@ namespace spirvPacker {
  * | extensions.compute     | String Array | Extensions for the compute shader stage                |
  */
 class DefaultInput final : public InputBase {
+ protected:
+  bool initializeStage() override;
+
  public:
   inline std::string getName() const noexcept override { return "defaultInput"; }
 
-  bool        initializeStage() override;
   StageResult run(Shader *_shader) override;
 };
 
