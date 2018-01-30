@@ -303,6 +303,7 @@ void SimpleReflector::getIdInfo(dis::DisassemblyData &_data, ShaderModule::ID_MA
         _map[lID].type            = info::IDType::Function;
         _map[lID].typeInfo        = GetType(3);
         _map[lID].functionControl = GetEnum(2);
+        break;
 
       default: break;
     }

@@ -69,11 +69,13 @@ typedef std::shared_ptr<ConstBase> CONST_PTR;
 
 //! \brief Base class for all SPIRV type structures
 struct TypeBase {
-  virtual uint32_t size() const noexcept { return 0; };
+  virtual ~TypeBase() {}
+  virtual uint32_t size() const noexcept { return 0; }
   virtual Type     type() const noexcept = 0;
 };
 
 struct ConstBase {
+  virtual ~ConstBase() {}
   virtual uint32_t value() const noexcept = 0;
 };
 
