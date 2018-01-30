@@ -24,6 +24,7 @@ layout (set = 0, binding = 0) uniform UBuffer {
   mat4 mvp;
   float lodBias;
   mat3 normal;
+  bool b1;
 } uBuff;
 
 layout (location = 0) out vec3  vNormals;

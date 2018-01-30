@@ -33,14 +33,16 @@ enum class StageType {
 };
 
 enum class StageResult {
-  SUCCESS,            //!< \brief Everything went fine
-  ERROR,              //!< \brief Some generic error occurred.
-  DATA_MISSING,       //!< \brief A previous stage was skipped or has not written any / enough data.
-  IO_ERROR,           //!< \brief Reading / writing data failed
-  COMPILER_ERROR,     //!< \brief compiling the shader stages failed
-  LINKER_ERROR,       //!< \brief Linking the shader stages failed
-  DISASSEMBLER_ERROR, //!< \brief Disassembling SPIR-V binary data failed
-  INVALID_SPIRV,      //!< \brief The SPIR-V binary data is not valid
+  SUCCESS,                //!< \brief Everything went fine
+  ERROR,                  //!< \brief Some generic error occurred.
+  DATA_MISSING,           //!< \brief A previous stage was skipped or has not written any / enough data.
+  IO_ERROR,               //!< \brief Reading / writing data failed
+  COMPILER_ERROR,         //!< \brief compiling the shader stages failed
+  LINKER_ERROR,           //!< \brief Linking the shader stages failed
+  DISASSEMBLER_ERROR,     //!< \brief Disassembling SPIR-V binary data failed
+  INVALID_SPIRV,          //!< \brief The SPIR-V binary data is not valid
+  REFLECTOR_ERROR,        //!< \brief The Reflector stage encounterd a problem
+  PREVIOUS_STAGE_MISSING, //!< \brief The stage requires the results of a previous stage
 };
 
 /*!

@@ -22,6 +22,7 @@
 #include "Disassembler.hpp"
 #include "GLSLangCompiler.hpp"
 #include "SPIRVDumper.hpp"
+#include "SimpleReflector.hpp"
 #include "SpirvPacker.hpp"
 #include <iostream>
 
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
   ConfigExport  lExporter;
   ConfigImport  lImporter;
   Shader        lShader;
+  auto          lLogger = getLogger();
 
   (void)argc;
   (void)argv;
@@ -43,6 +45,7 @@ int main(int argc, char *argv[]) {
   lPacker.addStage(make_shared<GLSLangCompiler>());
   lPacker.addStage(make_shared<SPIRVDumper>());
   lPacker.addStage(make_shared<Disassembler>());
+  lPacker.addStage(make_shared<SimpleReflector>());
   lPacker.initializeStages(lCfg);
 
   (*lCfg)["base"]("name")                          = "triangle1"_str;
@@ -50,14 +53,18 @@ int main(int argc, char *argv[]) {
   (*lCfg)["stages"]("compiler")                    = "glslang"_str;
   (*lCfg)["stages"]("disassembler")                = "Disassembler"_str;
   (*lCfg)["stages"]("generator")                   = "SPIRVDumper"_str;
+  (*lCfg)["stages"]("reflector")                   = "SimpleReflector"_str;
   (*lCfg)["input"]["defaultInput"]("directory")    = SOURCE_DIR + "/test/data"_str;
   (*lCfg)["generator"]["SPIRVDumper"]("directory") = SOURCE_DIR + "/build"_str;
 
-  bool lValRes = lCfg->validate();
-  cout << "Validation: " << (lValRes ? "true" : "false") << endl << endl;
+  if (!lCfg->validate()) {
+    lLogger->error("Validation of the configuration failed!");
+  }
 
-  lCfg->accept(&lExporter);
-  cout << lExporter.getResult() << endl;
+  lLogger->set_level(spdlog::level::debug);
+
+  //   lCfg->accept(&lExporter);
+  //   cout << lExporter.getResult() << endl;
 
   return lPacker.run(&lShader) == SpirvExecuteResult::SUCCESS ? 0 : 1;
 }

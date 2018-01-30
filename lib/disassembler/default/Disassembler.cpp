@@ -98,8 +98,6 @@ StageResult Disassembler::disassembleModule(ShaderModule &_mod) {
       return StageResult::INVALID_SPIRV;
     }
 
-    lLogger->debug("OP: {}; Words: {}; Operands: {}", Enum2Str::toStr(lInst.op), lWordCount, lInst.operands.size());
-
     lCurr += lWordCount;
   }
 

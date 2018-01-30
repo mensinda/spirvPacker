@@ -18,6 +18,7 @@
 
 #include "spvCfg.hpp"
 #include "SPIRVDisassembly.hpp"
+#include "SPIRVInfo.hpp"
 #include <map>
 #include <string>
 
@@ -42,12 +43,6 @@ enum class SourceFormat {
   HLSL  //!< \brief The source format of the input is HLSL
 };
 
-//! \brief All information of a SPIRV ID
-struct IdInfoSPIRV {
-  uint32_t    id   = UINT32_MAX;
-  std::string name = "<UNDEFINED>";
-};
-
 /*!
  * \brief Stores all information of a shader module
  *
@@ -55,7 +50,7 @@ struct IdInfoSPIRV {
  */
 struct ShaderModule final {
  public:
-  typedef std::map<uint32_t, IdInfoSPIRV> ID_MAP;
+  typedef std::map<uint32_t, info::IdInfoSPIRV> ID_MAP;
 
  private:
   ShaderType            vType   = ShaderType::__UNDEFINED__;

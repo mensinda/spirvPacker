@@ -54,12 +54,12 @@ SCENARIO("disassembling data", "[disassembler]") {
       auto &lData = lMod.getDisassemblyDataRef();
       REQUIRE(lData.magicNumber == 0x7230203);
       REQUIRE(lData.bound == 61);
-      REQUIRE(lData.generator.value == 0x80002);
+      REQUIRE(lData.generator.value == 0x80003);
       REQUIRE(lData.generator.tool == "Glslang Reference Front End");
       REQUIRE(lData.generator.vendor == "Khronos");
       REQUIRE(lData.generator.comment.empty() == false);
       REQUIRE(lData.headRaw.empty() == false);
-      REQUIRE(lData.instructions.size() == 109);
+      REQUIRE(lData.instructions.size() == 111);
 
       auto &lEntryP = lData.instructions[3];
       REQUIRE(lEntryP.op == spv::Op::OpEntryPoint);

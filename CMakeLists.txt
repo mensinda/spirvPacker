@@ -144,10 +144,11 @@ enum2str_generate(
   INCLUDES
     "spirv.hpp"
     "StageBase.hpp" "ShaderModule.hpp"
-    "SPIRVOperands.hpp"
+    "SPIRVOperands.hpp" "SPIRVInfo.hpp"
   ENUMS
     "StageType" "StageResult" "ShaderType" "SourceFormat"
     "dis::Category" "dis::Kind"
+    "info::IDType" "info::Type"
     ${SPIRV_ENUMS_NAMESPACE}
 )
 
