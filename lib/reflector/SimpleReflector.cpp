@@ -310,11 +310,23 @@ void SimpleReflector::getIdInfo(dis::DisassemblyData &_data, ShaderModule::ID_MA
   }
 }
 
+void SimpleReflector::getIOInfo(ShaderModule::ID_MAP &_map, info::ShaderIOInfo &_info) {
+  (void)_info;
+  for (auto &i : _map) {
+    auto &lID = i.second;
+    if (lID.type == info::IDType::Variable) {
+      // TODO
+    }
+  }
+}
+
+
 
 StageResult SimpleReflector::reflectModule(ShaderModule &_mod) {
   auto  lLogger  = getLogger();
   auto &lDisData = _mod.getDisassemblyDataRef();
   auto &lIdInfo  = _mod.getIdInformationMapRef();
+  auto &lIOInfo  = _mod.getModuleIOInfoRef();
 
   // Check if there is data
   if (lDisData.magicNumber == 0) {
@@ -324,6 +336,7 @@ StageResult SimpleReflector::reflectModule(ShaderModule &_mod) {
 
   try {
     getIdInfo(lDisData, lIdInfo);
+    getIOInfo(lIdInfo, lIOInfo);
   } catch (std::runtime_error &e) {
     lLogger->error("Reflection error: '{}'", e.what());
     return StageResult::REFLECTOR_ERROR;

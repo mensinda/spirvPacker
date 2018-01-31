@@ -90,5 +90,9 @@ SCENARIO("Using the StageBase class", "[framework]") {
       REQUIRE_THROWS_WITH(lStage.getRootConfigSection(), Contains("not yet initialized"));
       REQUIRE_THROWS_WITH(lStage.getStageBaseConfigSection(), Contains("not yet initialized"));
     }
+
+    THEN("the enum 2 str function returns <UNKNOWN> for stupid values") {
+      REQUIRE(StageBase::stageTypeToString(static_cast<StageType>(42)) == "<UNKNOWN>");
+    }
   }
 }

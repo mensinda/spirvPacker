@@ -30,6 +30,7 @@ class SimpleReflector : public ReflectorBase {
 
   static void decorate(dis::Decoration *_dec, info::IdInfoSPIRV::DEC_MAP &_out);
   void        getIdInfo(dis::DisassemblyData &_data, ShaderModule::ID_MAP &_map);
+  void        getIOInfo(ShaderModule::ID_MAP &_map, info::ShaderIOInfo &_info);
 
  public:
   SimpleReflector() = default;

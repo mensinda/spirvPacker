@@ -114,6 +114,16 @@ struct IdInfoSPIRV {
   std::map<uint32_t, IdInfoSPIRV> members;
 };
 
+struct ShaderIOInfo {
+  struct IO {};
+  struct Uniform {};
+
+  std::vector<IO>      inputs;
+  std::vector<IO>      outputs;
+  std::vector<Uniform> uniforms;
+  std::vector<Uniform> pushConstants;
+};
+
 
 // =============================
 // === Begin Type structures ===

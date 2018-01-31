@@ -24,7 +24,7 @@ using namespace Catch::Matchers;
 using namespace std;
 
 SCENARIO("Testing the simple reflector", "[reflector]") {
-  GIVEN("SPIRV data") {
+  GIVEN("SPIRV vertex data") {
     Disassembler    lDis;
     SimpleReflector lRef;
     Shader          lShader;
@@ -68,6 +68,50 @@ SCENARIO("Testing the simple reflector", "[reflector]") {
 
         THEN("the Reflector breaks") { REQUIRE(lRef.reflectModule(lMod) == StageResult::REFLECTOR_ERROR); }
       }
+
+      WHEN("The reflection is complete") {
+        REQUIRE(lRef.reflectModule(lMod) == StageResult::SUCCESS);
+
+        THEN("Passing nullptr fails") { REQUIRE(lRef.reflectShader(nullptr) == StageResult::ERROR); }
+
+        THEN("Using a valid shader succeeds") { REQUIRE(lRef.reflectShader(&lShader) == StageResult::SUCCESS); }
+      }
+    }
+  }
+
+  GIVEN("SPIRV fragment data") {
+    Disassembler    lDis;
+    SimpleReflector lRef;
+    Shader          lShader;
+    ShaderModule &  lMod = lShader.getModule(ShaderType::VERTEX);
+
+    FILE *fp = fopen((SOURCE_DIR + "/test/data/frag.spv"_str).c_str(), "rb");
+
+    REQUIRE(fp != nullptr);
+
+    vector<uint32_t> lContents;
+    fseek(fp, 0, SEEK_END);
+    lContents.resize(static_cast<size_t>(ftell(fp)) / sizeof(uint32_t));
+    rewind(fp);
+    fread(&lContents[0], 1, lContents.size() * sizeof(uint32_t), fp);
+    fclose(fp);
+
+    REQUIRE(lContents.empty() == false);
+    REQUIRE(lRef.initialize(make_shared<Config>()) == true);
+    REQUIRE(lDis.initialize(make_shared<Config>()) == true);
+
+    lMod.setType(ShaderType::VERTEX);
+    lMod.getSPIRVBinaryRef() = lContents;
+
+    // ===============================================================================
+    // === TODO      Do not use a dissassembler stage in this unit test       TODO ===
+    // === TODO Hardcode some data or write a serializer to JSON or something TODO ===
+    // ===============================================================================
+
+    WHEN("Dissassembling the SPIRV succeeds") {
+      REQUIRE(lDis.disassembleModule(lMod) == StageResult::SUCCESS);
+
+      THEN("reflecting also works") { REQUIRE(lRef.reflectModule(lMod) == StageResult::SUCCESS); }
     }
   }
 }

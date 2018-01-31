@@ -59,6 +59,7 @@ struct ShaderModule final {
   std::vector<uint32_t> vSPIRVBinary;
   dis::DisassemblyData  vDisassemblyData;
   ID_MAP                vIDInfo;
+  info::ShaderIOInfo    vIOInfo;
 
  public:
   ShaderModule() = default;
@@ -73,6 +74,7 @@ struct ShaderModule final {
   inline std::vector<uint32_t> &getSPIRVBinaryRef() noexcept { return vSPIRVBinary; }
   inline dis::DisassemblyData & getDisassemblyDataRef() noexcept { return vDisassemblyData; }
   inline ID_MAP &               getIdInformationMapRef() noexcept { return vIDInfo; }
+  inline info::ShaderIOInfo &   getModuleIOInfoRef() noexcept { return vIOInfo; }
   inline bool                   isValid() const noexcept { return vType != ShaderType::__UNDEFINED__; }
 
   static std::string             shaderType2Str(ShaderType _t) noexcept;
