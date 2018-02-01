@@ -62,8 +62,8 @@ struct Decoration {
   std::string     s0 = "";
 };
 
-struct TypeBase;
-struct ConstBase;
+class TypeBase;
+class ConstBase;
 typedef std::shared_ptr<TypeBase>  TYPE_PTR;
 typedef std::shared_ptr<ConstBase> CONST_PTR;
 

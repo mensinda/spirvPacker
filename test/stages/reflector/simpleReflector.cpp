@@ -78,6 +78,7 @@ SCENARIO("Testing the simple reflector", "[reflector]") {
               REQUIRE(i.second.constant);
               REQUIRE_NOTHROW(i.second.constant->value());
               REQUIRE(i.second.constant->type());
+              break;
             default: break;
           }
 
