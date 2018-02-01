@@ -60,7 +60,41 @@ SCENARIO("Testing the simple reflector", "[reflector]") {
     WHEN("Dissassembling the SPIRV succeeds") {
       REQUIRE(lDis.disassembleModule(lMod) == StageResult::SUCCESS);
 
-      THEN("reflecting also works") { REQUIRE(lRef.reflectModule(lMod) == StageResult::SUCCESS); }
+      THEN("reflecting also works") {
+        REQUIRE(lRef.reflectModule(lMod) == StageResult::SUCCESS);
+        auto &lIDs = lMod.getIdInformationMapRef();
+        REQUIRE(lIDs.size() == 38);
+        for (auto &i : lIDs) {
+          REQUIRE(i.second.type != info::IDType::Unknown);
+          switch (i.second.type) {
+            case info::IDType::Function:
+            case info::IDType::Type:
+            case info::IDType::Variable:
+              REQUIRE(i.second.typeInfo);
+              REQUIRE_NOTHROW(i.second.typeInfo->type());
+              REQUIRE_NOTHROW(i.second.typeInfo->size());
+              break;
+            case info::IDType::Constant:
+              REQUIRE(i.second.constant);
+              REQUIRE_NOTHROW(i.second.constant->value());
+              REQUIRE(i.second.constant->type());
+            default: break;
+          }
+
+          for (auto &j : i.second.decorations) {
+            auto &lDec = j.second;
+            switch (lDec.dec) {
+              case spv::Decoration::InputAttachmentIndex:
+              case spv::Decoration::Offset:
+              case spv::Decoration::MatrixStride:
+              case spv::Decoration::DescriptorSet:
+              case spv::Decoration::Binding:
+              case spv::Decoration::Location: REQUIRE(lDec.i0 != UINT32_MAX); break;
+              default: break;
+            }
+          }
+        }
+      }
 
       WHEN("messing with the dissassembled data") {
         // OpName %main "main" --> OpName "upps" "main"

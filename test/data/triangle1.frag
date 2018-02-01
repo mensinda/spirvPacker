@@ -20,6 +20,10 @@
 #extension GL_ARB_shading_language_420pack : enable
 
 layout (set = 0, binding = 1) uniform sampler2D samplerDiffuse;
+layout (input_attachment_index=0, set = 0, binding = 2) uniform subpassInput myInput;
+layout (push_constant, binding = 3) uniform PUBuff {
+  mat4 testMat;
+} pushConst;
 
 layout (location = 0) in vec3 vNormals;
 layout (location = 1) in vec2 vUV;

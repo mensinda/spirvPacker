@@ -45,6 +45,7 @@ SCENARIO("testing the DefaultInput", "[input]") {
         REQUIRE(lShader[ShaderType::VERTEX].getSourceCode() == lVertexSRC);
         REQUIRE(lShader[ShaderType::FRAGMENT].getSourceCode() == lFragmentSRC);
         REQUIRE(lShader[ShaderType::GEOMETRY].getSourceCode() == "");
+        REQUIRE(ShaderModule::shaderType2Str(static_cast<ShaderType>(42)) == "<UNKNOWN>");
       }
     }
 
@@ -57,5 +58,9 @@ SCENARIO("testing the DefaultInput", "[input]") {
         REQUIRE(lShader[ShaderType::VERTEX].isValid() == false);
       }
     }
+  }
+
+  WHEN("Reding source from a file that does not exist") {
+    THEN("An error is thrown") { REQUIRE_THROWS(DefaultInput::readSourceContent("/dfadfsag/fgafg/fffasd.txt")); }
   }
 }

@@ -68,15 +68,30 @@ typedef std::shared_ptr<TypeBase>  TYPE_PTR;
 typedef std::shared_ptr<ConstBase> CONST_PTR;
 
 //! \brief Base class for all SPIRV type structures
-struct TypeBase {
+class TypeBase {
+ private:
+  uint32_t vID = UINT32_MAX;
+
+ public:
+  TypeBase() = delete;
+  TypeBase(uint32_t _id) : vID(_id) {}
   virtual ~TypeBase() {}
   virtual uint32_t size() const noexcept { return 0; }
   virtual Type     type() const noexcept = 0;
+  uint32_t         id() const noexcept { return vID; }
 };
 
-struct ConstBase {
+class ConstBase {
+ private:
+  uint32_t vID = UINT32_MAX;
+
+ public:
+  ConstBase() = delete;
+  ConstBase(uint32_t _id) : vID(_id) {}
   virtual ~ConstBase() {}
   virtual uint32_t value() const noexcept = 0;
+  virtual TYPE_PTR type() const noexcept  = 0;
+  uint32_t         id() const noexcept { return vID; }
 };
 
 class Constant final : public ConstBase {
@@ -84,9 +99,9 @@ class Constant final : public ConstBase {
   std::vector<uint32_t> val;
 
  public:
-  Constant(TYPE_PTR _type, std::vector<uint32_t> _values) : typ(_type), val(_values) {}
-  Constant(TYPE_PTR _type, uint32_t _value) : typ(_type), val({_value}) {}
-  inline TYPE_PTR              type() const noexcept { return typ; }
+  Constant(uint32_t _id, TYPE_PTR _type, std::vector<uint32_t> _values) : ConstBase(_id), typ(_type), val(_values) {}
+  Constant(uint32_t _id, TYPE_PTR _type, uint32_t _value) : ConstBase(_id), typ(_type), val({_value}) {}
+  inline TYPE_PTR              type() const noexcept override { return typ; }
   inline std::vector<uint32_t> values() const noexcept { return val; }
   inline uint32_t              value() const noexcept override {
     if (val.empty())
@@ -115,13 +130,28 @@ struct IdInfoSPIRV {
 };
 
 struct ShaderIOInfo {
-  struct IO {};
-  struct Uniform {};
+  struct BaseIO {
+    TYPE_PTR          type         = nullptr;
+    spv::StorageClass storageClass = spv::StorageClass::Generic;
+    std::string       name         = "";
+  };
 
-  std::vector<IO>      inputs;
-  std::vector<IO>      outputs;
-  std::vector<Uniform> uniforms;
-  std::vector<Uniform> pushConstants;
+  struct IO : BaseIO {
+    uint32_t location = 0;
+  };
+  struct Uniform : BaseIO {
+    uint32_t set     = 0;
+    uint32_t binding = 0;
+  };
+  struct SubpassData : Uniform {
+    uint32_t inputAttachmentIndex = 0;
+  };
+
+  std::vector<IO>          inputs;
+  std::vector<IO>          outputs;
+  std::vector<Uniform>     uniforms;
+  std::vector<Uniform>     pushConstants;
+  std::vector<SubpassData> subpassInput;
 };
 
 
@@ -131,12 +161,14 @@ struct ShaderIOInfo {
 
 class TypeVoid final : public TypeBase {
  public:
+  TypeVoid(uint32_t _id) : TypeBase(_id) {}
   inline uint32_t size() const noexcept override { return 0; }
   inline Type     type() const noexcept override { return Type::Void; }
 };
 
 class TypeBool final : public TypeBase {
  public:
+  TypeBool(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::Bool; }
 };
 
@@ -149,8 +181,9 @@ class TypeInt final : public TypeBase {
   Signed   sign;
 
  public:
-  TypeInt(uint32_t _size, Signed _signed) : s(_size), sign(_signed) {}
-  TypeInt(uint32_t _size, uint32_t _signed) : s(_size), sign(static_cast<Signed>(_signed)) {}
+  TypeInt(uint32_t _id, uint32_t _size, Signed _signed) : TypeBase(_id), s(_size), sign(_signed) {}
+  TypeInt(uint32_t _id, uint32_t _size, uint32_t _signed)
+      : TypeBase(_id), s(_size), sign(static_cast<Signed>(_signed)) {}
   inline uint32_t size() const noexcept override { return s; }
   inline Type     type() const noexcept override { return Type::Int; }
   inline bool     isSigned() const noexcept { return sign == Signed::Yes; }
@@ -161,7 +194,7 @@ class TypeFloat final : public TypeBase {
   uint32_t s;
 
  public:
-  TypeFloat(uint32_t _size) : s(_size) {}
+  TypeFloat(uint32_t _id, uint32_t _size) : TypeBase(_id), s(_size) {}
   inline uint32_t size() const noexcept override { return s; }
   inline Type     type() const noexcept override { return Type::Float; }
 };
@@ -171,7 +204,7 @@ class TypeVector final : public TypeBase {
   TYPE_PTR comp;
 
  public:
-  TypeVector(uint32_t _count, TYPE_PTR _comp) : cnt(_count), comp(_comp) {}
+  TypeVector(uint32_t _id, uint32_t _count, TYPE_PTR _comp) : TypeBase(_id), cnt(_count), comp(_comp) {}
   inline uint32_t size() const noexcept override { return cnt * comp->size(); }
   inline Type     type() const noexcept override { return Type::Vector; }
   inline uint32_t count() const noexcept { return cnt; }
@@ -183,7 +216,7 @@ class TypeMatrix final : public TypeBase {
   TYPE_PTR comp;
 
  public:
-  TypeMatrix(uint32_t _count, TYPE_PTR _comp) : cnt(_count), comp(_comp) {}
+  TypeMatrix(uint32_t _id, uint32_t _count, TYPE_PTR _comp) : TypeBase(_id), cnt(_count), comp(_comp) {}
   inline uint32_t size() const noexcept override { return cnt * comp->size(); }
   inline Type     type() const noexcept override { return Type::Matrix; }
   inline uint32_t count() const noexcept { return cnt; }
@@ -208,7 +241,8 @@ class TypeImage final : public TypeBase {
   spv::AccessQualifier aq;
 
  public:
-  TypeImage(TYPE_PTR             _st,
+  TypeImage(uint32_t             _id,
+            TYPE_PTR             _st,
             spv::Dim             _dim,
             Depth                _depth,
             Arrayed              _arr,
@@ -216,7 +250,8 @@ class TypeImage final : public TypeBase {
             Sampled              _sampled,
             spv::ImageFormat     _format,
             spv::AccessQualifier _aq)
-      : sampledTypePTR(_st),
+      : TypeBase(_id),
+        sampledTypePTR(_st),
         dim(_dim),
         depthEnum(_depth),
         arrayedEnum(_arr),
@@ -225,7 +260,8 @@ class TypeImage final : public TypeBase {
         format(_format),
         aq(_aq) {}
 
-  TypeImage(TYPE_PTR _st,
+  TypeImage(uint32_t _id,
+            TYPE_PTR _st,
             uint32_t _dim,
             uint32_t _depth,
             uint32_t _arr,
@@ -233,7 +269,8 @@ class TypeImage final : public TypeBase {
             uint32_t _sampled,
             uint32_t _format,
             uint32_t _aq)
-      : sampledTypePTR(_st),
+      : TypeBase(_id),
+        sampledTypePTR(_st),
         dim(static_cast<spv::Dim>(_dim)),
         depthEnum(static_cast<Depth>(_depth)),
         arrayedEnum(static_cast<Arrayed>(_arr)),
@@ -254,6 +291,7 @@ class TypeImage final : public TypeBase {
 
 class TypeSampler final : public TypeBase {
  public:
+  TypeSampler(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::Sampler; }
 };
 
@@ -261,7 +299,7 @@ class TypeSampledImage final : public TypeBase {
   TYPE_PTR img;
 
  public:
-  TypeSampledImage(TYPE_PTR _image) : img(_image) {}
+  TypeSampledImage(uint32_t _id, TYPE_PTR _image) : TypeBase(_id), img(_image) {}
   inline Type     type() const noexcept override { return Type::SampledImage; }
   inline TYPE_PTR image() const noexcept { return img; }
 };
@@ -271,7 +309,8 @@ class TypeArray final : public TypeBase {
   CONST_PTR len;
 
  public:
-  TypeArray(TYPE_PTR _componentType, CONST_PTR _length) : comp(_componentType), len(_length) {}
+  TypeArray(uint32_t _id, TYPE_PTR _componentType, CONST_PTR _length)
+      : TypeBase(_id), comp(_componentType), len(_length) {}
   inline uint32_t  size() const noexcept override { return comp->size() * len->value(); }
   inline Type      type() const noexcept override { return Type::Array; }
   inline TYPE_PTR  componentType() const noexcept { return comp; }
@@ -282,7 +321,7 @@ class TypeRuntimeArray final : public TypeBase {
   TYPE_PTR comp;
 
  public:
-  TypeRuntimeArray(TYPE_PTR _componentType) : comp(_componentType) {}
+  TypeRuntimeArray(uint32_t _id, TYPE_PTR _componentType) : TypeBase(_id), comp(_componentType) {}
   inline Type     type() const noexcept override { return Type::RuntimeArray; }
   inline TYPE_PTR componentType() const noexcept { return comp; }
 };
@@ -291,12 +330,14 @@ class TypeStruct final : public TypeBase {
   std::vector<TYPE_PTR> comps;
 
  public:
-  TypeStruct(std::vector<TYPE_PTR> _members) : comps(_members) {}
+  TypeStruct(uint32_t _id, std::vector<TYPE_PTR> _members) : TypeBase(_id), comps(_members) {}
   inline Type                  type() const noexcept override { return Type::Struct; }
   inline std::vector<TYPE_PTR> members() const noexcept { return comps; }
 };
 
 class TypeOpaque final : public TypeBase {
+ public:
+  TypeOpaque(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::Opaque; }
 };
 
@@ -305,8 +346,9 @@ class TypePointer final : public TypeBase {
   TYPE_PTR          typ;
 
  public:
-  TypePointer(spv::StorageClass _class, TYPE_PTR _type) : stoClass(_class), typ(_type) {}
-  TypePointer(uint32_t _class, TYPE_PTR _type) : stoClass(static_cast<spv::StorageClass>(_class)), typ(_type) {}
+  TypePointer(uint32_t _id, spv::StorageClass _class, TYPE_PTR _type) : TypeBase(_id), stoClass(_class), typ(_type) {}
+  TypePointer(uint32_t _id, uint32_t _class, TYPE_PTR _type)
+      : TypeBase(_id), stoClass(static_cast<spv::StorageClass>(_class)), typ(_type) {}
   inline Type              type() const noexcept override { return Type::Pointer; }
   inline spv::StorageClass storageClass() const noexcept { return stoClass; }
   inline TYPE_PTR          pointerType() const noexcept { return typ; }
@@ -317,7 +359,8 @@ class TypeFunction final : public TypeBase {
   std::vector<TYPE_PTR> param;
 
  public:
-  TypeFunction(TYPE_PTR _ret, std::vector<TYPE_PTR> _parameters) : retType(_ret), param(_parameters) {}
+  TypeFunction(uint32_t _id, TYPE_PTR _ret, std::vector<TYPE_PTR> _parameters)
+      : TypeBase(_id), retType(_ret), param(_parameters) {}
   inline Type                  type() const noexcept override { return Type::Function; }
   inline std::vector<TYPE_PTR> parameters() const noexcept { return param; }
   inline TYPE_PTR              returnType() const noexcept { return retType; }
@@ -325,36 +368,43 @@ class TypeFunction final : public TypeBase {
 
 class TypeEvent final : public TypeBase {
  public:
+  TypeEvent(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::Event; }
 };
 
 class TypeDeviceEvent final : public TypeBase {
  public:
+  TypeDeviceEvent(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::DeviceEvent; }
 };
 
 class TypeReservedID final : public TypeBase {
  public:
+  TypeReservedID(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::ReservedID; }
 };
 
 class TypeQueue final : public TypeBase {
  public:
+  TypeQueue(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::Queue; }
 };
 
 class TypePipe final : public TypeBase {
  public:
+  TypePipe(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::Pipe; }
 };
 
 class TypePipeStorage final : public TypeBase {
  public:
+  TypePipeStorage(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::PipeStorage; }
 };
 
 class TypeNamedBarrier final : public TypeBase {
  public:
+  TypeNamedBarrier(uint32_t _id) : TypeBase(_id) {}
   inline Type type() const noexcept override { return Type::NamedBarrier; }
 };
 

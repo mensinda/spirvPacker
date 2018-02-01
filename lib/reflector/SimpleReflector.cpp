@@ -192,7 +192,7 @@ void SimpleReflector::getIdInfo(dis::DisassemblyData &_data, ShaderModule::ID_MA
         lLogger->warn("Group decoration currently unsupported ({})", Enum2Str::toStr(i.op));
         break;
 
-#define NEW(type, ...) std::make_shared<type>(__VA_ARGS__)
+#define NEW(type, ...) std::make_shared<type>(GetID(0), ##__VA_ARGS__)
 
         // =============
         // === Types ===
@@ -259,17 +259,17 @@ void SimpleReflector::getIdInfo(dis::DisassemblyData &_data, ShaderModule::ID_MA
       case Op::OpTypePipeStorage: Type() = NEW(info::TypePipeStorage); break;
       case Op::OpTypeNamedBarrier: Type() = NEW(info::TypeNamedBarrier); break;
 
-      case Op::OpTypeForwardPointer:
-        lLogger->warn("Type '{}' is currently unsupported", Enum2Str::toStr(i.op));
-        break;
+      case Op::OpTypeForwardPointer: lLogger->warn("Type '{}' is currently unsupported", Enum2Str::toStr(i.op)); break;
 
+#undef NEW
 
         // =================
         // === Constants ===
         // =================
 
       case Op::OpConstant:
-        Const(1) = NEW(info::Constant, GetType(0), _opI(2, {Kind::LiteralContextDependentNumber}));
+        Const(1) =
+            std::make_shared<info::Constant>(GetID(1), GetType(0), _opI(2, {Kind::LiteralContextDependentNumber}));
         break;
 
       case Op::OpConstantTrue:
@@ -281,8 +281,9 @@ void SimpleReflector::getIdInfo(dis::DisassemblyData &_data, ShaderModule::ID_MA
       case Op::OpSpecConstantFalse:
       case Op::OpSpecConstant:
       case Op::OpSpecConstantComposite:
-      case Op::OpSpecConstantOp: lLogger->warn("Constant '{}' is currently unsupported", Enum2Str::toStr(i.op)); break;
-#undef NEW
+      case Op::OpSpecConstantOp:
+        lLogger->warn("Constant '{}' is currently unsupported", Enum2Str::toStr(i.op));
+        break;
 
 
         // ===========
@@ -312,11 +313,84 @@ void SimpleReflector::getIdInfo(dis::DisassemblyData &_data, ShaderModule::ID_MA
 
 void SimpleReflector::getIOInfo(ShaderModule::ID_MAP &_map, info::ShaderIOInfo &_info) {
   (void)_info;
+  auto lLogger = getLogger();
+
   for (auto &i : _map) {
-    auto &lID = i.second;
-    if (lID.type == info::IDType::Variable) {
-      // TODO
+    // Only Variables are interresting
+    if (i.second.type != info::IDType::Variable)
+      continue;
+
+    // Only Pointer point to IO and uniforms
+    if (i.second.typeInfo->type() != info::Type::Pointer)
+      continue;
+
+    info::TypePointer *lPTR = dynamic_cast<info::TypePointer *>(i.second.typeInfo.get());
+    if (!lPTR) {
+      lLogger->warn("Corrupt type information for {} (ID: {})", i.second.name, i.second.id);
+      continue;
     }
+
+    auto lSerarchFor = [=](spv::Decoration _dec) -> uint32_t {
+      uint32_t lRet = UINT32_MAX;
+      for (auto &j : i.second.decorations) {
+        if (j.second.dec == _dec) {
+          lRet = j.second.i0;
+          break;
+        }
+      }
+
+      if (lRet == UINT32_MAX) {
+        lLogger->warn("Corrupt IO decoration {} (ID: {})", Enum2Str::toStr(_dec), i.second.id);
+        throw std::runtime_error("Corrupt Decoration");
+      }
+      return lRet;
+    };
+
+    // Skip builtin stuff
+    if (_map[lPTR->pointerType()->id()].name == "gl_PerVertex" || _map[lPTR->id()].name == "gl_PerVertex")
+      continue;
+
+    switch (lPTR->storageClass()) {
+      case StorageClass::Input: {
+        info::ShaderIOInfo::IO lIn;
+        lIn.name         = i.second.name;
+        lIn.type         = lPTR->pointerType();
+        lIn.storageClass = lPTR->storageClass();
+        lIn.location     = lSerarchFor(spv::Decoration::Location);
+        _info.inputs.push_back(lIn);
+        break;
+      }
+
+      case StorageClass::Output: {
+        info::ShaderIOInfo::IO lOut;
+        lOut.name         = i.second.name;
+        lOut.type         = lPTR->pointerType();
+        lOut.storageClass = lPTR->storageClass();
+        lOut.location     = lSerarchFor(spv::Decoration::Location);
+        _info.outputs.push_back(lOut);
+        break;
+      }
+
+      case StorageClass::UniformConstant: break;
+
+      case StorageClass::Uniform: break;
+
+      case StorageClass::PushConstant: break;
+
+      case StorageClass::Image:
+      case StorageClass::Workgroup:
+      case StorageClass::CrossWorkgroup:
+      case StorageClass::Private:
+      case StorageClass::Function:
+      case StorageClass::Generic:
+      case StorageClass::AtomicCounter:
+      case StorageClass::StorageBuffer:
+      case StorageClass::Max:
+        lLogger->warn("Storage class {} is currently unsupported", Enum2Str::toStr(lPTR->storageClass()));
+        break;
+    }
+
+    lLogger->debug("Found IO: {} ({})", i.second.name, Enum2Str::toStr(lPTR->storageClass()));
   }
 }
 

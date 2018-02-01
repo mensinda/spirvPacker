@@ -50,7 +50,7 @@ SCENARIO("testing the base disassembler", "[disassembler]") {
     THEN("running the disassembler succeeds") {
       lDis.vRan = false;
       REQUIRE(lDis.run(&lShader) == StageResult::SUCCESS);
-      REQUIRE(lDis.vRan = true);
+      REQUIRE(lDis.vRan == true);
     }
 
     WHEN("the shader is invalid") {
